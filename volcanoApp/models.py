@@ -196,17 +196,18 @@ class UserP(models.Model):
     id = models.OneToOneField(User,related_name='user_profile', on_delete=models.CASCADE, primary_key=True,unique=True)
     email = models.CharField(max_length=512)
     password = models.CharField(max_length=64)
-    firstname = models.CharField(max_length=128)
+    #firstname = models.CharField(max_length=128)
     lastname = models.CharField(max_length=128, blank=True, null=True)
     imagecover = models.TextField(blank=True, null=True)
     country = models.CharField(max_length=512, blank=True, null=True)
-    phone = models.IntegerField(blank=True, null=True)
+    comment = models.CharField(max_length=8192)
+    #phone = models.IntegerField(blank=True, null=True)
     username = models.CharField(max_length=128)
-    adress = models.CharField(max_length=512, blank=True, null=True)
+    institution = models.CharField(max_length=512)
     city = models.CharField(max_length=512, blank=True, null=True)
     state = models.IntegerField(blank=True, null=True, default = 1)#1 activo
     datecreation = models.DateTimeField(auto_now_add=True)
-    type = models.IntegerField(default = 1)# 0 admin 1 investigador 2 public
+    type = models.IntegerField(default = 3)# 0 admin 1 investigador 2 public 3 en espera
 
 
     class Meta:

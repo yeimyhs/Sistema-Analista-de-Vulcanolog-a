@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure-k+k21s28)+wqbq*y)#$r1oi9n5269)k)l&)w_d9xwmiyu&-n#^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+#ALLOWED_HOSTS = []
+#descpmentaar---------------------------------------
+ALLOWED_HOSTS = ['134.122.125.35', '127.0.0.1', 'localhost']
+DOMAIN = '134.122.125.35'
 
 
 # Application definition
@@ -38,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'drf_yasg',
+    'corsheaders',
     'volcanoApp',
     'psycopg2',
     'rest_framework',
@@ -48,11 +52,13 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'Volcano.urls'
@@ -84,8 +90,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'volcano2',
         'HOST' : '127.0.0.1',
-        'USER' : 'postgres',
-        'PASSWORD' : 'yeimyhs',
+        'USER' : 'lonccos',
+        'PASSWORD' : 'sistemas',
         'PORT' : '5432',    
     }
 }
@@ -110,11 +116,15 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-#
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES':('knox.auth.TokenAuthentication',),
- 
+    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',)
+    ,
+    #'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated',],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
+
 
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
@@ -126,24 +136,37 @@ USE_I18N = True
 
 USE_TZ = True
 
+CORS_ALLOWED_ORIGINS = [
+    "https://134.122.125.35",
+    "http://localhost:3000",
+    "http://localhost:8001",
+    "http://127.0.0.1:9000",
+]
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-STATIC_URL = 'static/'
-'''
-#--------------------------------------------------------------------
-STATIC_URL = '/static/'
+CORS_ORIGIN_WHITELIST = [
+    "https://134.122.125.35",
+    "http://localhost:3000",
+    "http://localhost:8001",
+    "http://127.0.0.1:9000",
+]
+CORS_ORIGIN_ALLOW_ALL = True
 import os
-STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
-'''
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
 
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+        os.path.join(BASE_DIR, 'Volcano/static'),
+]
+MEDIA_URL = '/media/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type
-# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+# https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-#descomentar! ------------------------------------------------------
-#STATIC_URL = '/static/
-#MEDIA_URL = '/static/
-#STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-#MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STATIC_URL = '/static/'
+MEDIA_URL = '/staticfiles/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

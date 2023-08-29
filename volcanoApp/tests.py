@@ -1,54 +1,193 @@
 from django.test import TestCase
-from rest_framework.test import APITestCase
-from rest_framework.reverse import reverse
 from rest_framework import status
-from .models import Alert, Alertconfiguration, Blob, Eventtype, History, Imagesegmentation, Mask, Meteorologicaldata, Station, Temporaryseries, UserP, Volcano
+from rest_framework.test import APIClient
+from django.urls import reverse
+from .models import UserP
+from .models import User
 
-# Create your tests here.
-from django.test import TestCase
-from .models import Alert, Alertconfiguration, Blob, Eventtype
-
-class AlertModelTestCase(TestCase):
+class RegistrationTestCase(TestCase):
     def setUp(self):
-        Alert.objects.create(
-            messagealert="Test Message",
-            statealert=1,
+        self.client = APIClient()
+        self.register_url = reverse("volcanoApp:register") 
+        self.login_url = reverse("volcanoApp:login") 
+        self.logout_url = reverse("volcanoApp:logout")
+        self.list_url = reverse("volcanoApp:userp-list")
+        self.user = User.objects.create_user(username="testuserlogin", password="testpassword")
+
+
+    def test_successful_registration(self):
+        data = {
+            "username": "testuser",
+            "lastname": "Test Lastname",
+            "password": "testpassword",
+            "email": "test@example.com",
+            "institution": "Test Institution",
+            "comment": "Test Comment"
+        }
+        response = self.client.post(reverse("volcanoApp:register"), data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(UserP.objects.count(), 1)
+
+    def test_missing_required_fields(self):
+        data = {
+            "username": "testuser",
+            "lastname": "Test Lastname",
+            # Missing 'password', 'email', and 'institution'
+            "comment": "Test Comment"
+        }
+        response = self.client.post(reverse("volcanoApp:register"), data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(UserP.objects.count(), 0)
+
+    # Agrega más pruebas según tus necesidades...
+
+    def test_default_field_values(self):
+        data = {
+            "username": "testuser",
+            "lastname": "Test Lastname",
+            "password": "testpassword",
+            "email": "test@example.com",
+            "institution": "Test Institution",
+            "comment": "Test Comment"
+        }
+        response = self.client.post(reverse("volcanoApp:register"), data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user_profile = UserP.objects.first()
+        self.assertEqual(user_profile.country, "")  # Empty country
+        self.assertEqual(user_profile.city, "")     # Empty city
+        self.assertEqual(user_profile.state, 1)     # State = 1
+        self.assertIsNotNone(user_profile.datecreation)
+        self.assertEqual(user_profile.type, 3)      # Type = 3
+
+    def test_missing_optional_fields(self):
+        data = {
+            "username": "testuser",
+            "lastname": "Test Lastname",
+            "password": "testpassword",
+            "email": "test@example.com",
+            "institution": "Test Institution",
+            "comment": "Test Comment"
+            # Missing 'country', 'city', and 'state'
+        }
+        response = self.client.post(reverse("volcanoApp:register"), data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user_profile = UserP.objects.first()
+        self.assertEqual(user_profile.country, "")  # Empty country
+        self.assertEqual(user_profile.city, "")     # Empty city
+        self.assertEqual(user_profile.state, 1)     # State = 1
+
+    def test_default_field_values_for_creation(self):
+        data = {
+            "username": "testuser",
+            "lastname": "Test Lastname",
+            "password": "testpassword",
+            "email": "test@example.com",
+            "institution": "Test Institution",
+            "comment": "Test Comment",
+            "state": 2  
+        }
+        response = self.client.post(reverse("volcanoApp:register"), data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user_profile = UserP.objects.first()
+        active = 1
+        self.assertEqual(user_profile.state, active)     # State = 2 (overridden value)
+#-----------------------------------------------------------------------------------------------------------login
+    def test_successful_login(self):
+        data = {
+            "username": "testuserlogin",
+            "password": "testpassword"
+        }
+        response = self.client.post(self.login_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue("token" in response.data)
+
+    def test_invalid_credentials(self):
+        data = {
+            "username": "testuserlogin",
+            "password": "incorrectpassword"
+        }
+        response = self.client.post(self.login_url, data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+#-----------------------------------------------------------------------------------------------------------logout
+    def test_successful_logout(self):
+        # Iniciar sesión para obtener un token
+        login_data = {
+            "username": "testuserlogin",
+            "password": "testpassword"
+        }
+        login_response = self.client.post(self.login_url, login_data, format="json")
+        self.assertEqual(login_response.status_code, status.HTTP_200_OK)
+        token = login_response.data.get("token")
+
+        # Realizar cierre de sesión con el token
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token}")
+        response = self.client.post(self.logout_url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_logout_without_authentication(self):
+        # Intento de cierre de sesión sin autenticación
+        response = self.client.post(self.logout_url, format="json")
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+#-----------------------------------------------------------------------------------------------------------lsitado edicion eliminar NO crear UserP
+    def test_list_user_profiles(self):
+        response = self.client.get(self.list_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_update_user_profile(self):
+        user_profile = UserP.objects.create(
+            id=self.user,
+            username="testuserprof",
+            lastname="Test Lastname",
+            email="test@example.com",
+            institution="Test Institution",
+            comment="Test Comment",
+            state=1,
+            type=3
+        )
+        update_data = {
+            "username": "updatedusername",
+            "lastname": "Updated Lastname"
+        }
+        response = self.client.patch(reverse("volcanoApp:userp-detail", args=[self.user_profile.pk]), update_data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(user_profile.username, "updatedusername")
+        self.assertEqual(user_profile.lastname, "Updated Lastname")
+
+    def test_update_user_profile(self):
+        # Crear el perfil de usuario directamente en el test
+        user_profile = UserP.objects.create(
+            id=self.user,
+            username="testuser",
+            lastname="Test Lastname",
+            email="test@example.com",
+            institution="Test Institution",
+            comment="Test Comment",
+            state=1,
+            type=3
         )
 
-    def test_alert_creation(self):
-        alert = Alert.objects.get(messagealert="Test Message")
-        self.assertEqual(alert.statealert, 1)
+        update_data = {
+            "username": "updatedusername",
+            "lastname": "Updated Lastname"
+        }
+        response = self.client.patch(reverse("volcanoApp:userp-detail", args=[user_profile.pk]), update_data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        user_profile.refresh_from_db()
+        self.assertEqual(user_profile.username, "updatedusername")
+        self.assertEqual(user_profile.lastname, "Updated Lastname")
 
-class AlertconfigurationModelTestCase(TestCase):
-    def setUp(self):
-        Alertconfiguration.objects.create(
-            altitudalertconf=100.0,
-            statealertconf=2,
-        )
+    def test_create_user_profile(self):
+        # Intento de creación de un perfil de usuario, debería ser denegado
+        create_data = {
+            "username": "newuser",
+            "lastname": "New Lastname",
+            "email": "new@example.com",
+            "institution": "New Institution",
+            "comment": "New Comment",
+            "state": 0,
+            "type": 2
+        }
+        response = self.client.post(self.list_url, create_data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(UserP.objects.filter(username="newuser").exists())
 
-    def test_alertconfiguration_creation(self):
-        alertconf = Alertconfiguration.objects.get(altitudalertconf=100.0)
-        self.assertEqual(alertconf.statealertconf, 2)
-
-class BlobModelTestCase(TestCase):
-    def setUp(self):
-        Blob.objects.create(
-            filenameblob="test_file.jpg",
-            heightblob=200,
-            stateblob=3,
-        )
-
-    def test_blob_creation(self):
-        blob = Blob.objects.get(filenameblob="test_file.jpg")
-        self.assertEqual(blob.heightblob, 200)
-
-class EventtypeModelTestCase(TestCase):
-    def setUp(self):
-        Eventtype.objects.create(
-            nameevent="Test Event",
-            stateevent=4,
-        )
-
-    def test_eventtype_creation(self):
-        eventtype = Eventtype.objects.get(nameevent="Test Event")
-        self.assertEqual(eventtype.stateevent, 4)

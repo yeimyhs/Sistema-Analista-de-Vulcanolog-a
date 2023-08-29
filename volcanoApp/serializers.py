@@ -5,6 +5,7 @@ from volcanoApp.models import Alert, Alertconfiguration, Blob, Eventtype, Histor
 from django.contrib.auth.models import User
 
 from django.db import transaction
+from rest_framework import serializers
 #-------------------------------
 # User Serializer
 @transaction.atomic
@@ -19,13 +20,13 @@ def create_user_and_profile(validated_data):
         id=user,
         username=user.username,
         email=user.email,
-        firstname=validated_data['firstname'],
+        #firstname=validated_data['firstname'],
         lastname=validated_data['lastname'],
-        country=validated_data['country'],
-        phone=validated_data['phone'],
-        adress=validated_data['adress'],
-        city=validated_data['city'],
-        imagecover=validated_data['imagecover'],
+        country=validated_data.get('country', ''),
+        #adress=validated_data['adress'],
+         city=validated_data.get('city', ''),
+        imagecover=validated_data.get('imagecover', ''),
+        comment=validated_data['comment'],
     )
     user_profile.save()
 
@@ -50,40 +51,32 @@ class UserPSerializer(ModelSerializer):
         model = UserP
         fields = [
         'id',
-        'username', 
-        'email' ,
-        'imagecover',
-        'firstname',
+        'username',
         'lastname',
+        'email',
+        'institution',
         'country',
-        'phone',
-        'adress',
         'city',
         'state',
         'datecreation',
-        'type'
+        'type',
+        'comment'
         ]
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        user, user_profile = create_user_and_profile(validated_data)
-        return user
+        raise serializers.PermissionDenied("Creation not allowed through this endpoint.")
 
 class RegisterSerializer(ModelSerializer):
     class Meta:
         model = UserP
         fields = [
             'username',
-            'email',
-            'password',
-            'imagecover',
-            'firstname',
             'lastname',
-            'country',
-            'phone',
-            'adress',
-            'city',
-            'type'
+            'password',
+            'email',
+            'institution',
+            'comment'
         ]
         extra_kwargs = {'password': {'write_only': True}}
 

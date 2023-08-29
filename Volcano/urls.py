@@ -18,7 +18,9 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
 
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     path('volcanoApp/admin/', admin.site.urls),
     path('volcanoApp/', include(('volcanoApp.urls','volcanoApp'))),
-]
+]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
