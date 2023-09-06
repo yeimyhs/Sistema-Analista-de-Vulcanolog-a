@@ -37,12 +37,13 @@ class Alertconfiguration(models.Model):
 
 
 class Blob(models.Model):
-    idblob = models.BigAutoField(db_column='idBlob', primary_key=True)  # Field name made lowercase.
+    idblob = models.CharField(max_length=21,db_column='idBlob', primary_key=True)  # Field name made lowercase.
     idmask = models.ForeignKey('Mask', models.DO_NOTHING, db_column='idMask')  # Field name made lowercase.
-    starttimeblob = models.DateTimeField(db_column='startTimeBlob')  # Field name made lowercase.
-    filenameblob = models.TextField(db_column='fileNameBlob')  # Field name made lowercase.
-    directionblob = models.BigIntegerField(db_column='directionBlob')  # Field name made lowercase.
-    heightblob = models.IntegerField(db_column='heightBlob')  # Field name made lowercase.
+    indblob = models.CharField(max_length=1,db_column='indblob')  # Field name made lowercase.
+    perimetertblob = models.FloatField(db_column='perimeterblob')  # Field name made lowercase.
+    xcentroidtblob = models.FloatField(db_column='xCentroidblob')  # Field name made lowercase.
+    ycentroidtblob = models.FloatField(db_column='yCentroidblob')  # Field name made lowercase.
+    areatblob = models.FloatField(db_column='areablob')  # Field name made lowercase.
     stateblob = models.SmallIntegerField(db_column='stateBlob')  # Field name made lowercase.
     datecreationblob = models.DateTimeField(db_column='dateCreationBlob',auto_now_add=True)  # Field name made lowercase.
 
@@ -86,16 +87,13 @@ class Imagesegmentation(models.Model):
 
 
 class Mask(models.Model):
-    idmask = models.BigAutoField(db_column='idMask', primary_key=True)  # Field name made lowercase.
+    idmask = models.CharField(max_length=21,db_column='idMask', primary_key=True)  # Field name made lowercase.
     idphoto = models.ForeignKey(Imagesegmentation, models.DO_NOTHING, db_column='idPhoto')  # Field name made lowercase.
-    starttimetmask = models.DateTimeField(db_column='startTimetMask')  # Field name made lowercase.
-    filenametmask = models.TextField(db_column='fileNametMask')  # Field name made lowercase.
-    perimetertmask = models.FloatField(db_column='perimetertMask')  # Field name made lowercase.
-    xcentroidtmask = models.FloatField(db_column='xCentroidtMask')  # Field name made lowercase.
-    ycentroidtmask = models.FloatField(db_column='yCentroidtMask')  # Field name made lowercase.
-    directiontmask = models.TextField(db_column='directiontMask')  # Field name made lowercase.
-    areatmask = models.FloatField(db_column='areatMask')  # Field name made lowercase.
-    heightmask = models.FloatField(db_column='heightMask')  # Field name made lowercase.
+    indmask = models.CharField(max_length=1,db_column='indmask')  # Field name made lowercase.
+    starttimemask = models.DateTimeField(db_column='startTimemask')  # Field name made lowercase.
+    filenamemask = models.TextField(db_column='fileNamemask')  # Field name made lowercase.
+    directionmask = models.TextField(db_column='directionmask')  # Field name made lowercase.
+    heighmask = models.FloatField(db_column='heighmask')  # Field name made lowercase.
     idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
     idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano')  # Field name made lowercase.
 
@@ -119,7 +117,7 @@ class Meteorologicaldata(models.Model):
     idtemporaryseries = models.ForeignKey('Temporaryseries', models.DO_NOTHING, db_column='idTemporarySeries', blank=True, null=True)  # Field name made lowercase.
     statemet = models.SmallIntegerField(db_column='stateMet')  # Field name made lowercase.
     datecreationmet = models.DateTimeField(db_column='dateCreationMet',auto_now_add=True)  # Field name made lowercase.
-    idmetereorologicaldata = models.BigAutoField(db_column='idMetereorologicalData', primary_key=True)  # Field name made lowercase.
+    idmetereorologicaldata = models.CharField(max_length=21,db_column='idMetereorologicalData', primary_key=True)  # Field name made lowercase.
 
     class Meta:
         db_table = 'MeteorologicalData'
@@ -144,7 +142,7 @@ class Station(models.Model):
 
 
 class Temporaryseries(models.Model):
-    idtemporaryseries = models.BigAutoField(db_column='idTemporarySeries', primary_key=True)  # Field name made lowercase.
+    idtemporaryseries = models.CharField(max_length=21,db_column='idTemporarySeries', primary_key=True)  # Field name made lowercase.
     idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano')  # Field name made lowercase.
     idstation = models.ForeignKey(Station, models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
     ideventtype = models.ForeignKey(Eventtype, models.DO_NOTHING, db_column='idEventType')  # Field name made lowercase.

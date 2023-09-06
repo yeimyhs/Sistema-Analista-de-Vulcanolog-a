@@ -11,6 +11,9 @@ from knox.models import AuthToken, User
 from rest_framework import generics
 from django.db import transaction
 from rest_framework.response import Response
+
+from rest_framework import status
+from rest_framework.response import Response
 #----------------------------------------------------------------------Login imports
 from rest_framework import permissions
 from rest_framework.authtoken.serializers import AuthTokenSerializer
@@ -120,7 +123,10 @@ class TemporaryseriesViewSet(ModelViewSet):
 class UserPViewSet(ModelViewSet):
     queryset = UserP.objects.order_by('pk')
     serializer_class = UserPSerializer
-
+    def create(self, request, *args, **kwargs):
+        # Devuelve una respuesta de error con código 403 (Forbidden)
+        return Response({"detail": "La creación de instancias está prohibida en esta vista."},
+                        status=status.HTTP_403_FORBIDDEN)
 
 class VolcanoViewSet(ModelViewSet):
     queryset = Volcano.objects.order_by('pk')

@@ -93,9 +93,19 @@ DATABASES = {
         'USER' : 'lonccos',
         'PASSWORD' : 'sistemas',
         'PORT' : '5432',    
-    }
-}
+    },
 
+}
+'''
+    'mongodb': {
+        'ENGINE': 'djongo',
+        'ENFORCE_SCHEMA': False,
+        'NAME': 'volcanojson',  # Nombre de tu base de datos MongoDB.
+        'CLIENT': {
+            'host': 'localhost',  # Cambia a la ubicación de tu servidor MongoDB si es necesario.
+        }
+    }
+'''
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -170,3 +180,10 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/staticfiles/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'yhuancas@unsa.edu.pe'
+EMAIL_HOST_PASSWORD = 'viueknltpginudiy'
