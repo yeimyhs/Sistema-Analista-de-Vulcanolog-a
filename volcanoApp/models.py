@@ -29,7 +29,7 @@ class Alertconfiguration(models.Model):
     datecreationalertconf = models.TimeField(db_column='dateCreationAlertConf',auto_now_add=True)  # Field name made lowercase.
     idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano', blank=True, null=True)  # Field name made lowercase.
     notificationalertconf = models.BigIntegerField(db_column='notificationAlertConf', blank=True, null=True)  # Field name made lowercase.
-    messagetemplateconfalert = models.BigIntegerField(db_column='messageTemplateConfAlert', blank=True, null=True)  # Field name made lowercase.
+    messagetemplateconfalert = models.TextField(db_column='messageTemplateConfAlert', blank=True, null=True)  # Field name made lowercase.
     mensajeriaalertconf = models.SmallIntegerField(db_column='mensajeriaAlertConf', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
@@ -225,7 +225,7 @@ class Volcano(models.Model):
     attcorrectfactorvol = models.FloatField(db_column='attCorrectFactorVol')  # Field name made lowercase.
     indvol = models.IntegerField(db_column='indVol')  # Field name made lowercase.
     statevol = models.SmallIntegerField(db_column='stateVol')  # Field name made lowercase.
-    datecreationvol = models.DateTimeField(db_column='DateCreationVol')  # Field name made lowercase.
+    datecreationvol = models.DateTimeField(auto_now_add=True,db_column='DateCreationVol')  # Field name made lowercase.
 
     class Meta:
         db_table = 'Volcano'
