@@ -1,0 +1,18 @@
+#!/bin/sh
+
+[Unit]
+Description=gunicorn daemon
+Requires=volcanogunicorn.socket
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/home/root/volcanov1
+ExecStart=/home/root/volcanov1/volcanoVirtEnv/bin/gunicorn --access-logfile - \
+          --workers 3 \
+          --bind unix:/run/volcanogunicorn.sock \
+          Volcano.wsgi:application
+[Install]
+WantedBy=multi-user.target
+
