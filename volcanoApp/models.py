@@ -31,13 +31,14 @@ class Alertconfiguration(models.Model):
     notificationalertconf = models.BigIntegerField(db_column='notificationAlertConf', blank=True, null=True)  # Field name made lowercase.
     messagetemplateconfalert = models.TextField(db_column='messageTemplateConfAlert', blank=True, null=True)  # Field name made lowercase.
     mensajeriaalertconf = models.SmallIntegerField(db_column='mensajeriaAlertConf', blank=True, null=True)  # Field name made lowercase.
+    startalert = models.SmallIntegerField(db_column='startAlertConf') 
 
     class Meta:
         db_table = 'AlertConfiguration'
 
 
-class Blob(models.Model):
-    idblob = models.CharField(max_length=21,db_column='idBlob', primary_key=True)  # Field name made lowercase.
+class Blob(models.Model):#SABCAJA2023082202000000
+    idblob = models.CharField(max_length=23,db_column='idBlob', primary_key=True)  # Field name made lowercase.
     idmask = models.ForeignKey('Mask', models.DO_NOTHING, db_column='idMask')  # Field name made lowercase.
     indblob = models.CharField(max_length=1,db_column='indblob')  # Field name made lowercase.
     perimetertblob = models.FloatField(db_column='perimeterblob')  # Field name made lowercase.
@@ -49,13 +50,21 @@ class Blob(models.Model):
 
     class Meta:
         db_table = 'Blob'
+'''    def generate_default_idblob(self):
+        prefix = self.shortnamevol[:3] if self.shortnamevol else 'default_prefix'
+        count = Volcano.objects.filter(idvolcano__startswith=prefix).count() + 1
+        return f"{prefix}{count:07d}"
 
-
+    def save(self, *args, **kwargs):
+        if not self.idvolcano:
+            self.idvolcano = self.generate_default_idvolcano()
+        super().save(*args, **kwargs)
+'''
 class Eventtype(models.Model):
-    ideventtype = models.BigAutoField(db_column='idEventType', primary_key=True)  # Field name made lowercase.
+    ideventtype = models.CharField(max_length=10,db_column='idEventType', primary_key=True) 
     nameevent = models.CharField(db_column='nameEvent', max_length=126)  # Field name made lowercase.
     datecreationevent = models.DateTimeField(db_column='dateCreationEvent',auto_now_add=True)  # Field name made lowercase.
-    stateevent = models.BigIntegerField(db_column='stateEvent')  # Field name made lowercase.
+    stateevent = models.SmallIntegerField(db_column='stateEvent')  # Field name made lowercase.
 
     class Meta:
         db_table = 'EventType'
@@ -70,32 +79,37 @@ class History(models.Model):
     idtabletochangehistory = models.BigIntegerField(db_column='idTableToChangeHistory')  # Field name made lowercase.
     iduser = models.ForeignKey(User, models.DO_NOTHING, db_column='idUser')  # Field name made lowercase.
     idregisterhistory = models.BigIntegerField(db_column='idRegisterHistory')  # Field name made lowercase.
+    statehistory = models.SmallIntegerField(db_column='stateHistory')  # Field name made lowercase.
 
     class Meta:
         db_table = 'History'
 
 
 class Imagesegmentation(models.Model):
-    idphoto = models.BigAutoField(db_column='idPhoto', primary_key=True)  # Field name made lowercase.
+    idphoto = models.CharField(max_length=21, db_column='idPhoto', primary_key=True)  # Field name made lowercase.
     urlimg = models.TextField(db_column='urlImg')  # Field name made lowercase.
     filenameimg = models.CharField(db_column='fileNameImg', max_length=128)  # Field name made lowercase.
     stateimg = models.SmallIntegerField(db_column='stateImg')  # Field name made lowercase.
     datecreationimg = models.DateTimeField(db_column='dateCreationImg',auto_now_add=True)  # Field name made lowercase.
+    idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
 
     class Meta:
         db_table = 'ImageSegmentation'
 
 
-class Mask(models.Model):
-    idmask = models.CharField(max_length=21,db_column='idMask', primary_key=True)  # Field name made lowercase.
-    idphoto = models.ForeignKey(Imagesegmentation, models.DO_NOTHING, db_column='idPhoto')  # Field name made lowercase.
+class Mask(models.Model):#SABCAJA20230822020000
+    #idmask = models.CharField(max_length=21,db_column='idMask', primary_key=True)  # Field name made lowercase.
+    idmask = models.OneToOneField(Imagesegmentation,db_column='idMask', primary_key=True,on_delete=models.CASCADE)  # Field name made lowercase.
+    ###################################### borrar , blank=True, null=True
+    #idphoto = models.ForeignKey(Imagesegmentation, models.DO_NOTHING, db_column='idPhoto', blank=True, null=True)  # Field name made lowercase.
     indmask = models.CharField(max_length=1,db_column='indmask')  # Field name made lowercase.
     starttimemask = models.DateTimeField(db_column='startTimemask')  # Field name made lowercase.
     filenamemask = models.TextField(db_column='fileNamemask')  # Field name made lowercase.
     directionmask = models.TextField(db_column='directionmask')  # Field name made lowercase.
     heighmask = models.FloatField(db_column='heighmask')  # Field name made lowercase.
-    idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
-    idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano')  # Field name made lowercase.
+    #idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
+    #idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano')  # Field name made lowercase.
+    statemask = models.SmallIntegerField(db_column='statemask')  # Field name made lowercase.
 
     class Meta:
         db_table = 'Mask'
@@ -113,8 +127,9 @@ class Meteorologicaldata(models.Model):
     geopotentialheightmet = models.FloatField(db_column='geopotentialHeightMet')  # Field name made lowercase.
     indmet = models.IntegerField(db_column='indMet')  # Field name made lowercase.
     jsonidmet = models.BigIntegerField(db_column='jsonIdMet')  # Field name made lowercase.
-    idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano', blank=True, null=True)  # Field name made lowercase.
-    idtemporaryseries = models.ForeignKey('Temporaryseries', models.DO_NOTHING, db_column='idTemporarySeries', blank=True, null=True)  # Field name made lowercase.
+    #idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano', blank=True, null=True)  # Field name made lowercase.
+    idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
+    idtemporaryseries = models.ForeignKey('Temporaryseries', models.DO_NOTHING, db_column='idTemporarySeries', blank=True, null=True)  # Field name made lowercase.                                                        5                                                                                                                                                                                                                                                      = models.ForeignKey('Temporaryseries', models.DO_NOTHING, db_column='idTemporarySeries', blank=True, null=True)  # Field name made lowercase.
     statemet = models.SmallIntegerField(db_column='stateMet')  # Field name made lowercase.
     datecreationmet = models.DateTimeField(db_column='dateCreationMet',auto_now_add=True)  # Field name made lowercase.
     idmetereorologicaldata = models.CharField(max_length=21,db_column='idMetereorologicalData', primary_key=True)  # Field name made lowercase.
@@ -124,7 +139,7 @@ class Meteorologicaldata(models.Model):
 
 
 class Station(models.Model):
-    idstation = models.BigAutoField(db_column='idStation', primary_key=True)  # Field name made lowercase.
+    idstation = models.CharField(db_column='idStation', max_length=10, primary_key=True)  # Field name made lowercase.
     standardnamestat = models.CharField(db_column='standardNameStat', max_length=64)  # Field name made lowercase.
     shortnamestat = models.CharField(db_column='shortNameStat', max_length=20)  # Field name made lowercase.
     longnamestat = models.CharField(db_column='longNameStat', max_length=126)  # Field name made lowercase.
@@ -136,16 +151,17 @@ class Station(models.Model):
     statestat = models.IntegerField(db_column='stateStat')  # Field name made lowercase.
     datecreationstat = models.DateTimeField(db_column='dateCreationStat',auto_now_add=True)  # Field name made lowercase.
     typestat = models.SmallIntegerField(db_column='typeStat', blank=True, null=True)  # Field name made lowercase.
+    idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         db_table = 'Station'
 
 
-class Temporaryseries(models.Model):
+class Temporaryseries(models.Model): #SABSABA20230820202649
     idtemporaryseries = models.CharField(max_length=21,db_column='idTemporarySeries', primary_key=True)  # Field name made lowercase.
-    idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano')  # Field name made lowercase.
+    #idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano')  # Field name made lowercase.
     idstation = models.ForeignKey(Station, models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
-    ideventtype = models.ForeignKey(Eventtype, models.DO_NOTHING, db_column='idEventType')  # Field name made lowercase.
+    ideventtype = models.ForeignKey(Eventtype, models.DO_NOTHING, db_column='idEventType', null=True)  # Field name made lowercase.
     meantempser = models.FloatField(db_column='meanTempSer')  # Field name made lowercase.
     variancetempser = models.FloatField(db_column='varianceTempSer')  # Field name made lowercase.
     standarddeviationtempser = models.FloatField(db_column='standardDeviationTempSer')  # Field name made lowercase.
@@ -184,23 +200,33 @@ class Temporaryseries(models.Model):
     starttimetempser = models.DateTimeField(db_column='startTimeTempSer')  # Field name made lowercase.
     datecreationtempser = models.DateTimeField(db_column='dateCreationTempSer',auto_now_add=True)  # Field name made lowercase.
     statetempser = models.SmallIntegerField(db_column='stateTempSer')  # Field name made lowercase.
-
+    indtempser = models.IntegerField(db_column='indTempSer', null=True)  # Field name made lowercase.
+    
+    def generate_default_id(instance, attribute_name, max_length):
+        # Obtener el valor del atributo especificado
+        attribute_value = getattr(instance, attribute_name)
+        prefix = attribute_value[:3]
+        ModelClass = instance.__class__
+        count = ModelClass.objects.filter(id__startswith=prefix).count() + 1
+        return f"{prefix}{count:0{max_length-3}d}"
     class Meta:
         db_table = 'TemporarySeries'
+
+    
 
 
 class UserP(models.Model):
     #id = models.BigAutoField(primary_key=True)
     id = models.OneToOneField(User,related_name='user_profile', on_delete=models.CASCADE, primary_key=True,unique=True)
-    email = models.CharField(max_length=512)
+    email = models.EmailField(unique=True)
     password = models.CharField(max_length=64)
     #firstname = models.CharField(max_length=128)
     lastname = models.CharField(max_length=128, blank=True, null=True)
-    imagecover = models.TextField(blank=True, null=True)
+    imagecover = models.ImageField( blank=True)
     country = models.CharField(max_length=512, blank=True, null=True)
     comment = models.CharField(max_length=8192)
-    #phone = models.IntegerField(blank=True, null=True)
-    username = models.CharField(max_length=128)
+    phone = models.IntegerField(blank=True, null=True)
+    names = models.CharField(max_length=128)
     institution = models.CharField(max_length=512)
     city = models.CharField(max_length=512, blank=True, null=True)
     state = models.IntegerField(blank=True, null=True, default = 1)#1 activo
@@ -210,12 +236,13 @@ class UserP(models.Model):
 
     class Meta:
         db_table = 'User'
-
-
+    
 class Volcano(models.Model):
-    idvolcano = models.BigAutoField(db_column='idVolcano', primary_key=True)  # Field name made lowercase.
     shortnamevol = models.CharField(db_column='shortNameVol', max_length=20)  # Field name made lowercase.
     longnamevol = models.CharField(db_column='longNameVol', max_length=126)  # Field name made lowercase.
+    idvolcano = models.CharField(db_column='idVolcano', max_length=9, primary_key=True,
+        blank=True,  # Permite que idvolcano no sea obligatorio
+    )
     descriptionvol = models.TextField(db_column='descriptionVol')  # Field name made lowercase.
     latitudevol = models.FloatField(db_column='latitudeVol')  # Field name made lowercase.
     longitudevol = models.FloatField(db_column='longitudeVol')  # Field name made lowercase.
@@ -229,3 +256,17 @@ class Volcano(models.Model):
 
     class Meta:
         db_table = 'Volcano'
+    
+    def generate_default_idvolcano(self):
+        prefix = self.shortnamevol[:3] if self.shortnamevol else 'default_prefix'
+        count = Volcano.objects.filter(idvolcano__startswith=prefix).count() + 1
+        return f"{prefix}{count:07d}"
+
+    def save(self, *args, **kwargs):
+        if not self.idvolcano:
+            self.idvolcano = self.generate_default_idvolcano()
+        super().save(*args, **kwargs)
+
+class Mapping(models.Model):
+    tablenamemap = models.CharField(max_length=50, db_column='tablenameMap', primary_key=True)
+    attributeskeysmap = models.JSONField(db_column='attributeskeysMap')  # Field name made lowercase.

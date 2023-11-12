@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'knox',
     'rest_framework.authtoken',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -135,7 +136,6 @@ REST_FRAMEWORK = {
      'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
-
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
@@ -168,8 +168,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
         os.path.join(BASE_DIR, 'Volcano/static'),
 ]
-MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
@@ -177,7 +177,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATIC_URL = '/static/'
-MEDIA_URL = '/staticfiles/'
+MEDIA_URL = 'volcanoApp/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -185,5 +185,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'yhuancas@unsa.edu.pe'
-EMAIL_HOST_PASSWORD = 'viueknltpginudiy'
+EMAIL_HOST_USER = 'jveras@unsa.edu.pe'
+EMAIL_HOST_PASSWORD = 'vnjprxaehqoggxtu'
+
+TELEGRAM_TOKEN = "6319696449:AAHMMT6jxs5FCU53avvefZDdmK7ZCkZPy_M"
+TELEGRAM_CHANNEL_CHAT_ID = "-1001945707253"
+
+TWILIO_WSP_ACCOUNT_SID = 'AC4be8d2722d0fd93e4d4ee9560b82d91e'
+TWILIO_WSP_AUTH_TOKEN = '013844f3eed7d5063cb8b8f4419dc28e'

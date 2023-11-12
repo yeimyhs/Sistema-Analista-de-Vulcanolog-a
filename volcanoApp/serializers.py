@@ -1,32 +1,102 @@
 from rest_framework.serializers import ModelSerializer
 from volcanoApp.models import Alert, Alertconfiguration, Blob, Eventtype, History, Imagesegmentation, Mask, Meteorologicaldata, Station, Temporaryseries, Volcano\
-, UserP
+, UserP, Mapping
 
 from django.contrib.auth.models import User
 
 from django.db import transaction
 from rest_framework import serializers
 #-------------------------------
+from django.contrib.auth.models import User
+from rest_framework import serializers
+from django.db import transaction
+from .models import UserP
+
+from django.conf import settings
+
+@transaction.atomic
+def create_user_and_profile(validated_data):
+    # Extraer 'names' del validated_data
+    names = validated_data.pop('names', '')
+
+    # Crear el usuario
+    user = User.objects.create_user(
+        username=names,  # Usar 'names' como username
+        email=validated_data['email'],
+        password=validated_data['password'],
+    )
+
+    # Crear el perfil de usuario (UserP)
+    user_profile = UserP(
+        id=user,  # Asignar el usuario recién creado
+        names=names,  # Usar 'names' como nombres
+        email=user.email,
+        lastname=validated_data.get('lastname', ''),
+        country=validated_data.get('country', ''),
+        city=validated_data.get('city', ''),
+        imagecover=validated_data.get('imagecover', ''),
+        comment=validated_data['comment'],
+    )
+    user_profile.save()
+
+    return user, user_profile
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'id',
+            'username',
+            'email',
+        )
+
+    def create(self, validated_data):
+        user, user_profile = create_user_and_profile(validated_data)
+        return user
+
+class UserPSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserP
+        fields = [
+            'id',
+            'names',
+            'lastname',
+            'email',
+            'institution',
+            'country',
+            'city',
+            'state',
+            'datecreation',
+            'type',
+            'comment',
+            'phone'
+        ]
+
 # User Serializer
 @transaction.atomic
 def create_user_and_profile(validated_data):
+    # Extraer 'names' del validated_data
+    names = validated_data.pop('names', '')
+
+    # Crear el usuario
     user = User.objects.create_user(
-        validated_data['username'], 
-        validated_data['email'], 
-        validated_data['password'],
+        username=names,  # Usar 'names' como username
+        email=validated_data['email'],
+        password=validated_data['password'],
     )
 
+    # Crear el perfil de usuario (UserP)
     user_profile = UserP(
-        id=user,
-        username=user.username,
+        id=user,  # Asignar el usuario recién creado
+        names=names,  # Usar 'names' como nombres
         email=user.email,
-        #firstname=validated_data['firstname'],
-        lastname=validated_data['lastname'],
+        lastname=validated_data.get('lastname', ''),
         country=validated_data.get('country', ''),
-        #adress=validated_data['adress'],
-         city=validated_data.get('city', ''),
+        city=validated_data.get('city', ''),
         imagecover=validated_data.get('imagecover', ''),
         comment=validated_data['comment'],
+        phone=validated_data['phone'],
+        
     )
     user_profile.save()
 
@@ -51,7 +121,7 @@ class UserPSerializer(ModelSerializer):
         model = UserP
         fields = [
         'id',
-        'username',
+        'names',
         'lastname',
         'email',
         'institution',
@@ -60,31 +130,36 @@ class UserPSerializer(ModelSerializer):
         'state',
         'datecreation',
         'type',
-        'comment'
+        'comment',
+        'imagecover',
+        'phone'
         ]
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
         raise serializers.PermissionDenied("Creation not allowed through this endpoint.")
 
-class RegisterSerializer(ModelSerializer):
+class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserP
         fields = [
-            'username',
+            'names',
             'lastname',
             'password',
             'email',
             'institution',
-            'comment'
+            'comment',
+            'phone'
         ]
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
+        # Extrae el valor de 'names'
         user, user_profile = create_user_and_profile(validated_data)
         return user, user_profile
-        
-        
+       
+ 
+ 
 class AlertSerializer(ModelSerializer):
 
     class Meta:
@@ -97,6 +172,7 @@ class AlertconfigurationSerializer(ModelSerializer):
     class Meta:
         model = Alertconfiguration
         fields = '__all__'
+
 
 
 class BlobSerializer(ModelSerializer):
@@ -126,12 +202,46 @@ class ImagesegmentationSerializer(ModelSerializer):
         model = Imagesegmentation
         fields = '__all__'
 
+import requests
+from django.conf import settings
 
+from twilio.rest import Client
+client = Client(settings.TWILIO_WSP_ACCOUNT_SID, settings.TWILIO_WSP_AUTH_TOKEN)
 class MaskSerializer(ModelSerializer):
 
     class Meta:
         model = Mask
         fields = '__all__'
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        # Realizar el condicional aquí
+        super().save(*args, **kwargs)
+        volcano_obj= self.instance.idmask.idstation.idvolcano,  # Reemplaza con el ID del volcán asociado
+        idvolcanoimg = volcano_obj[0]
+        print("------------------",idvolcanoimg)
+        alertconf = Alertconfiguration.objects.filter(idvolcano=idvolcanoimg).first()
+        print("------------------",alertconf)
+        if self.instance.heighmask > alertconf.altitudalertconf:
+            nueva_alerta = Alert(
+                messagealert=alertconf.messagetemplateconfalert,  # Reemplaza con el mensaje real
+                statealert=1,  # Reemplaza con el estado real
+                idvolcano=idvolcanoimg,  # Reemplaza con el ID del volcán asociado
+                idalertconf= alertconf,  # Reemplaza con el ID de la configuración de alerta asociada
+            )
+            message = alertconf.messagetemplateconfalert
+            url = f"https://api.telegram.org/bot{settings.TELEGRAM_TOKEN}/sendMessage?chat_id={settings.TELEGRAM_CHANNEL_CHAT_ID}&text={message}"
+            print(requests.get(url).json())
+            # Guardar la nueva alerta en la base de datos
+            
+            # lista de todos los numeros
+            message = client.messages.create(
+                from_='whatsapp:+14155238886',
+                body=alertconf.messagetemplateconfalert,
+                to=['whatsapp:+51973584851']
+                )
+            nueva_alerta.save()
+
+
 
 
 class MeteorologicaldataSerializer(ModelSerializer):
@@ -162,3 +272,8 @@ class VolcanoSerializer(ModelSerializer):
         fields = '__all__'
 
 
+class MappingSerializer(ModelSerializer):
+
+    class Meta:
+        model = Mapping
+        fields = '__all__'

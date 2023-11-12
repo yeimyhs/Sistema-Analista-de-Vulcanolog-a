@@ -13,12 +13,12 @@ class RegistrationTestCase(TestCase):
         self.login_url = reverse("volcanoApp:login") 
         self.logout_url = reverse("volcanoApp:logout")
         self.list_url = reverse("volcanoApp:userp-list")
-        self.user = User.objects.create_user(username="testuserlogin", password="testpassword")
+        self.user = User.objects.create_user(names="testuserlogin", password="testpassword")
 
 
     def test_successful_registration(self):
         data = {
-            "username": "testuser",
+            "names": "testuser",
             "lastname": "Test Lastname",
             "password": "testpassword",
             "email": "test@example.com",
@@ -31,7 +31,7 @@ class RegistrationTestCase(TestCase):
 
     def test_missing_required_fields(self):
         data = {
-            "username": "testuser",
+            "names": "testuser",
             "lastname": "Test Lastname",
             # Missing 'password', 'email', and 'institution'
             "comment": "Test Comment"
@@ -40,11 +40,9 @@ class RegistrationTestCase(TestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(UserP.objects.count(), 0)
 
-    # Agrega más pruebas según tus necesidades...
-
     def test_default_field_values(self):
         data = {
-            "username": "testuser",
+            "names": "testuser",
             "lastname": "Test Lastname",
             "password": "testpassword",
             "email": "test@example.com",
@@ -62,7 +60,7 @@ class RegistrationTestCase(TestCase):
 
     def test_missing_optional_fields(self):
         data = {
-            "username": "testuser",
+            "names": "testuser",
             "lastname": "Test Lastname",
             "password": "testpassword",
             "email": "test@example.com",
@@ -79,7 +77,7 @@ class RegistrationTestCase(TestCase):
 
     def test_default_field_values_for_creation(self):
         data = {
-            "username": "testuser",
+            "names": "testuser",
             "lastname": "Test Lastname",
             "password": "testpassword",
             "email": "test@example.com",
@@ -95,7 +93,7 @@ class RegistrationTestCase(TestCase):
 #-----------------------------------------------------------------------------------------------------------login
     def test_successful_login(self):
         data = {
-            "username": "testuserlogin",
+            "names": "testuserlogin",
             "password": "testpassword"
         }
         response = self.client.post(self.login_url, data, format="json")
@@ -104,7 +102,7 @@ class RegistrationTestCase(TestCase):
 
     def test_invalid_credentials(self):
         data = {
-            "username": "testuserlogin",
+            "names": "testuserlogin",
             "password": "incorrectpassword"
         }
         response = self.client.post(self.login_url, data, format="json")
@@ -113,7 +111,7 @@ class RegistrationTestCase(TestCase):
     def test_successful_logout(self):
         # Iniciar sesión para obtener un token
         login_data = {
-            "username": "testuserlogin",
+            "names": "testuserlogin",
             "password": "testpassword"
         }
         login_response = self.client.post(self.login_url, login_data, format="json")
@@ -137,7 +135,7 @@ class RegistrationTestCase(TestCase):
     def test_update_user_profile(self):
         user_profile = UserP.objects.create(
             id=self.user,
-            username="testuserprof",
+            names="testuserprof",
             lastname="Test Lastname",
             email="test@example.com",
             institution="Test Institution",
@@ -146,19 +144,19 @@ class RegistrationTestCase(TestCase):
             type=3
         )
         update_data = {
-            "username": "updatedusername",
+            "names": "updatedusername",
             "lastname": "Updated Lastname"
         }
         response = self.client.patch(reverse("volcanoApp:userp-detail", args=[self.user_profile.pk]), update_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(user_profile.username, "updatedusername")
+        self.assertEqual(user_profile.names, "updatedusername")
         self.assertEqual(user_profile.lastname, "Updated Lastname")
 
     def test_update_user_profile(self):
         # Crear el perfil de usuario directamente en el test
         user_profile = UserP.objects.create(
             id=self.user,
-            username="testuser",
+            names="testuser",
             lastname="Test Lastname",
             email="test@example.com",
             institution="Test Institution",
@@ -168,19 +166,20 @@ class RegistrationTestCase(TestCase):
         )
 
         update_data = {
-            "username": "updatedusername",
+            "names": "updatedusername",
             "lastname": "Updated Lastname"
         }
-        response = self.client.patch(reverse("volcanoApp:userp-detail", args=[user_profile.pk]), update_data, format="json")
+        response = self.client.patch(reverse("volcanoApp:userp-detail", args=[user_profile.pk])
+                                     , update_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         user_profile.refresh_from_db()
-        self.assertEqual(user_profile.username, "updatedusername")
+        self.assertEqual(user_profile.names, "updatedusername")
         self.assertEqual(user_profile.lastname, "Updated Lastname")
 
     def test_create_user_profile(self):
         # Intento de creación de un perfil de usuario, debería ser denegado
         create_data = {
-            "username": "newuser",
+            "names": "newuser",
             "lastname": "New Lastname",
             "email": "new@example.com",
             "institution": "New Institution",
@@ -190,5 +189,5 @@ class RegistrationTestCase(TestCase):
         }
         response = self.client.post(self.list_url, create_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.assertFalse(UserP.objects.filter(username="newuser").exists())
+        self.assertFalse(UserP.objects.filter(names="newuser").exists())
 

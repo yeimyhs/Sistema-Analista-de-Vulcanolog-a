@@ -8,7 +8,7 @@ from volcanoApp.models import UserP
 def sync_userp_data(sender, instance, **kwargs):
     try:
         user = User.objects.get(pk=instance.id_id)
-        user.username = instance.username
+        user.username = instance.names
         user.email = instance.email
         user.save()
     except User.DoesNotExist:

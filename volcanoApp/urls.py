@@ -40,8 +40,14 @@ urlpatterns = [
     path('userbyToken/', views.UserAPI.as_view()),
    
    #path("password_change", views.password_change, name="password_change"),
+   path("maskimgrawpertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.MaskImgRawPerTime.as_view(), name="MaskImgRawPerTime"),
+   path("tempseriespertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.TempSeriesPerTime.as_view(), name="TempSeriesPerTime"),
+   path('all/alertconfiguration/', views.AlertconfigurationViewSet.as_view({'get': 'all'}), name='alertconfigurations-all'),
+   path('all/userp/', views.UserPViewSet.as_view({'get': 'all'}), name='userp-all'),
+   path('all/station/', views.StationViewSet.as_view({'get': 'all'}), name='station-all'),
+   path('all/volcano/', views.VolcanoViewSet.as_view({'get': 'all'}), name='volcano-all'),
 
-
+   path('mailer/', views.mailer.as_view()),
     re_path(r'^swagger(<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
@@ -61,5 +67,7 @@ router.register(r'station', views.StationViewSet)
 router.register(r'temporaryseries', views.TemporaryseriesViewSet)
 router.register(r'userp', views.UserPViewSet)
 router.register(r'volcano', views.VolcanoViewSet)
+router.register(r'mapping', views.MappingViewSet)
 
 urlpatterns += router.urls
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
