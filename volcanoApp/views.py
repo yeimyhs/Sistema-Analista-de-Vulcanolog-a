@@ -240,7 +240,7 @@ class StationViewSet(ModelViewSet):
         return Response(data)
     
 class TemporaryseriesViewSet(ModelViewSet):
-    queryset = Temporaryseries.filter(statetempser=1).objects.order_by('pk')
+    queryset = Temporaryseries.objects.filter(statetempser=1).order_by('pk')
     serializer_class = TemporaryseriesSerializer
 
 class MappingViewSet(ModelViewSet):
