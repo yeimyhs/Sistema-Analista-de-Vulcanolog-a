@@ -193,3 +193,23 @@ TELEGRAM_CHANNEL_CHAT_ID = "-1001945707253"
 
 TWILIO_WSP_ACCOUNT_SID = 'AC4be8d2722d0fd93e4d4ee9560b82d91e'
 TWILIO_WSP_AUTH_TOKEN = '013844f3eed7d5063cb8b8f4419dc28e'
+
+import firebase_admin
+from firebase_admin import credentials
+import json
+cred_dict = {
+    "type": "service_account",
+    "project_id": "proyecto-sabancaya",
+    "private_key_id": "02a91dcc084ff0d5251f2142403d799d838b23cc",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDLEQmjwiuDgi2w\nqUu6TU/y3RnP6f+GkKJEist12Dt/mqjDJYV3puGkEBQnsTkO7luydvPbpmesaCde\nIy4nS7zS+Okv8k/wLRkyM9nNNnXBtNcSBfZu+/jWaAbntT6J6b2frqA/dq+UD+V7\nTsy47D5i3NMUBxEa5EYMw48zvIGg4BI8t2wWh9iHVNWcPK2a6ELT/tZso6wbMoNP\nQ85GiNfRj4v5NXVdfGwSu6CAsz7zjmeJufbYM07sOImfJmNoqZYBlIkdUa56nAo4\n9KODNem2PVBy8ZyrCarfRYLc28AD6lgirjcaUo+gqj9isOY91Lbd9Jw0VzPJgTwG\n1Wx8OiA9AgMBAAECggEAJfC9PRZAhI3sRPtgnYKn6x/B3J2jAyyfUNCg4pf/x9/o\n46stRHWO55UkeuULHN3OjqnYdqPg7263WkiW7TsioMVmZjGvG1gFwuI6sbOY7VQB\nMgogqMxVyhN+JMkxkdl09zKMmMbvV6nfrboDmJJ1Non9Oxr16HEZoHViWl+AVcLq\nkmINJCwQKXHfC6aTiSY/UpSKWEEWhvKSyN3etBfRkxYSG9Li/egSuCaTgxonCT8g\nGM7Rv2WXWq1NbNAQ5ryKdEDjCMs6pFhXyTzJ9IwUhNLzbENXW+l8GqXmCQQifXSu\ngA8h9oJdniO6BdcL8p3kffe7R/fCXjwGLL93LFt8+QKBgQDqMTFOrD9HW0MMdZ/Y\nL8uUzCH1+0O1Eq0ytpU92F77x+h/eRapUv5rt05t8grM7RGx9YNBc/CRSQ7+OTGG\nzTuVpvIPAysQtiKaxrvXz1b+DTSRTqlPAwPNfvMW7kWv4/p3EyBtFUlKhmW1oGME\nf72CivSVfREKZogl+wEgvqTjCQKBgQDd+dre/NeINUiT59pNJHOAaQJ5YvH9GyLi\nq0krXKCbeVGObcDwdGfA+R8LRPksseOfJFpdOP9I2dX44qlGBiJ0mc7p8J/LS8TB\nR4dCtU6xWldV+GCq9Whsw3pq/jHjKZutbRQELgRxaNQnoYf7OYNDxwCwp1TqOMJK\nfaIW7EUclQKBgQDKESXtLtvuksT4ZClGXH745WVMG7/g5buBbV66HQ5fiq6GBpHS\nCaUyhdhrLxO4m7jP5vmYqRPiF7qTCgA8wqptxr1GzMIEylJzX5RGckUqMXSxB8E4\nRm6qiaXvnCmOyVOcGGm7FUnGvs3VeAzXneyDTagZr+7bHXrN4pSnjzcwGQKBgHkS\nqODrhBvVBEs4MQfWk/E8VY8j+t2VCYgc6QHvueJTX7qR/qSouVa2Csq4yjgopwDM\ncUVbq1JvDph7+NwqyGxU4FkVV/Mo1p6dhxdJkSyHHA/WM9PLmzOHw6PMFiXTMgh7\n8Gj/OIkrJlyfbG4IxqIXTzcLbfN7Fe5PbDOYl3GpAoGARdH72h5dODaVAH+176u5\nbTH/DdgOIsaHIPf7WBTiYJjp5xhGEpScmxVtRsY586LdywP8sAF6o546j6BBsJBP\nhs+CUgr3oiQ5ro6vBHewWy39io1L9Et76azJcdu26pFp6YXXG/4HRBc4HN3RrDpV\nHFm234DwSRZ8NBdvpDQP1uo=\n-----END PRIVATE KEY-----\n",
+    "client_email": "firebase-adminsdk-98bi0@proyecto-sabancaya.iam.gserviceaccount.com",
+    "client_id": "106776977131620523888",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-98bi0%40proyecto-sabancaya.iam.gserviceaccount.com",
+    "universe_domain": "googleapis.com"
+}
+
+cred = credentials.Certificate(cred_dict)
+firebase_admin.initialize_app(cred)

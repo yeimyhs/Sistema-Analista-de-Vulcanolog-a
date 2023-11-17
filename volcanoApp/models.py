@@ -225,7 +225,7 @@ class UserP(models.Model):
     imagecover = models.ImageField( blank=True)
     country = models.CharField(max_length=512, blank=True, null=True)
     comment = models.CharField(max_length=8192)
-    phone = models.IntegerField(blank=True, null=True)
+    phone = models.CharField(max_length=12, unique=True)
     names = models.CharField(max_length=128)
     institution = models.CharField(max_length=512)
     city = models.CharField(max_length=512, blank=True, null=True)

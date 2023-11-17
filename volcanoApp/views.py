@@ -44,23 +44,45 @@ from rest_framework.response import Response
 from .models import Mask, Imagesegmentation
 #----------------------------------------------------------------------MaskImgRawPerTime
 
-class TempSeriesPerTime(generics.GenericAPIView):
+class MeteorologicalDataPertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
 
-    def get(self, request, idstation, starttime, finishtime):
+    def get(self, request, idstation, starttime, finishtime,value= "vmet"):
         try:
             idstation = idstation
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
-            TSs_within_interval = Temporaryseries.objects.filter(
+            MDs_within_interval = Meteorologicaldata.objects.filter(statemet=1).filter(
+                Q(idstation=idstation),
+                starttimemet__gte=starttime,
+                starttimemet__lte=finishtime
+            )
+            serializer = MeteorologicaldataSerializer(MDs_within_interval, many=True)
+            response_data = [{'starttime': item['starttimemet'], 'value': item[value]} for item in serializer.data]
+
+            return Response({'results': response_data})
+        except Exception as e:
+            return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
+
+class TempSeriesPerTime(generics.GenericAPIView):
+    queryset = []  # Define una consulta ficticia
+
+    def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
+        try:
+            idstation = idstation
+            starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
+            finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
+            #lapsemin = int(lapsemin)
+            #starttime = starttime - timedelta(hours=6)
+            TSs_within_interval = Temporaryseries.objects.filter(statetempser=1).filter(
                 Q(idstation=idstation),
                 starttimetempser__gte=starttime,
                 starttimetempser__lte=finishtime
             )
             serializer = TemporaryseriesSerializer(TSs_within_interval, many=True)
-            response_data = [{'starttimetempser': item['starttimetempser'], 'waveskewnesstempser': item['waveskewnesstempser']} for item in serializer.data]
+            response_data = [{'starttimetempser': item['starttimetempser'], 'value': item[value]} for item in serializer.data]
 
             return Response({'results': response_data})
         except Exception as e:
@@ -77,7 +99,7 @@ class MaskImgRawPerTime(generics.GenericAPIView):
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
-            masks_within_interval = Mask.objects.filter(
+            masks_within_interval = Mask.objects.filter.filter(statemask=1)(
                 Q(idmask__idstation=idstation),
                 starttimemask__gte=starttime,
                 starttimemask__lte=finishtime
