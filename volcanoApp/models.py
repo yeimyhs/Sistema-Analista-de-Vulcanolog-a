@@ -102,7 +102,7 @@ class Mask(models.Model):#SABCAJA20230822020000
     idmask = models.OneToOneField(Imagesegmentation,db_column='idMask', primary_key=True,on_delete=models.CASCADE)  # Field name made lowercase.
     ###################################### borrar , blank=True, null=True
     #idphoto = models.ForeignKey(Imagesegmentation, models.DO_NOTHING, db_column='idPhoto', blank=True, null=True)  # Field name made lowercase.
-    indmask = models.CharField(max_length=1,db_column='indmask')  # Field name made lowercase.
+    indmask = models.SmallIntegerField(db_column='indmask')  # Field name made lowercase.
     starttimemask = models.DateTimeField(db_column='startTimemask')  # Field name made lowercase.
     filenamemask = models.TextField(db_column='fileNamemask')  # Field name made lowercase.
     directionmask = models.TextField(db_column='directionmask')  # Field name made lowercase.
@@ -125,8 +125,8 @@ class Meteorologicaldata(models.Model):
     directionmet = models.FloatField(db_column='directionMet')  # Field name made lowercase.
     temperaturemet = models.FloatField(db_column='temperatureMet')  # Field name made lowercase.
     geopotentialheightmet = models.FloatField(db_column='geopotentialHeightMet')  # Field name made lowercase.
-    indmet = models.IntegerField(db_column='indMet')  # Field name made lowercase.
-    jsonidmet = models.BigIntegerField(db_column='jsonIdMet')  # Field name made lowercase.
+    indmet = models.IntegerField(db_column='indMet', blank=True, null=True)  # Field name made lowercase.
+    jsonidmet = models.BigIntegerField(db_column='jsonIdMet',)  # Field name made lowercase.
     #idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano', blank=True, null=True)  # Field name made lowercase.
     idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
     idtemporaryseries = models.ForeignKey('Temporaryseries', models.DO_NOTHING, db_column='idTemporarySeries', blank=True, null=True)  # Field name made lowercase.                                                        5                                                                                                                                                                                                                                                      = models.ForeignKey('Temporaryseries', models.DO_NOTHING, db_column='idTemporarySeries', blank=True, null=True)  # Field name made lowercase.

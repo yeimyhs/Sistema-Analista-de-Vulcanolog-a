@@ -261,27 +261,28 @@ class MaskSerializer(ModelSerializer):
         #print("------------------",idvolcanoimg)
         alertconf = Alertconfiguration.objects.filter(idvolcano=idvolcanoimg).first()
         #print("------------------",alertconf)
-        if self.instance.heighmask > alertconf.altitudalertconf:
-            nueva_alerta = Alert(
-                messagealert=alertconf.messagetemplateconfalert,  # Reemplaza con el mensaje real
-                statealert=1,  # Reemplaza con el estado real
-                idvolcano=idvolcanoimg,  # Reemplaza con el ID del volcán asociado
-                idalertconf= alertconf,  # Reemplaza con el ID de la configuración de alerta asociada
-            )
-            message = alertconf.messagetemplateconfalert
-            url = f"https://api.telegram.org/bot{settings.TELEGRAM_TOKEN}/sendMessage?chat_id={settings.TELEGRAM_CHANNEL_CHAT_ID}&text={message}"
-            #print(requests.get(url).json())
-            # Guardar la nueva alerta en la base de datos
-            '''
-            # lista de todos los numeros
-            message = client.messages.create(
-                from_='whatsapp:+14155238886',
-                body=alertconf.messagetemplateconfalert,
-                to=['whatsapp:+51973584851']
+        if alertconf is not None:
+            if self.instance.heighmask > alertconf.altitudalertconf:
+                nueva_alerta = Alert(
+                    messagealert=alertconf.messagetemplateconfalert,  # Reemplaza con el mensaje real
+                    statealert=1,  # Reemplaza con el estado real
+                    idvolcano=idvolcanoimg,  # Reemplaza con el ID del volcán asociado
+                    idalertconf= alertconf,  # Reemplaza con el ID de la configuración de alerta asociada
                 )
-            '''
-            #send_sms_messages(alertconf.messagetemplateconfalert)
-            nueva_alerta.save()
+                message = alertconf.messagetemplateconfalert
+                url = f"https://api.telegram.org/bot{settings.TELEGRAM_TOKEN}/sendMessage?chat_id={settings.TELEGRAM_CHANNEL_CHAT_ID}&text={message}"
+                #print(requests.get(url).json())
+                # Guardar la nueva alerta en la base de datos
+                '''
+                # lista de todos los numeros
+                message = client.messages.create(
+                    from_='whatsapp:+14155238886',
+                    body=alertconf.messagetemplateconfalert,
+                    to=['whatsapp:+51973584851']
+                    )
+                '''
+                #send_sms_messages(alertconf.messagetemplateconfalert)
+                nueva_alerta.save()
 
 
 
