@@ -161,7 +161,7 @@ class Temporaryseries(models.Model): #SABSABA20230820202649
     idtemporaryseries = models.CharField(max_length=21,db_column='idTemporarySeries', primary_key=True)  # Field name made lowercase.
     #idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano')  # Field name made lowercase.
     idstation = models.ForeignKey(Station, models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
-    ideventtype = models.ForeignKey(Eventtype, models.DO_NOTHING, db_column='idEventType', null=True)  # Field name made lowercase.
+    ideventtype = models.ForeignKey(Eventtype, models.DO_NOTHING, db_column='idEventType',default="000")  # No se identifica Field name made lowercase.
     meantempser = models.FloatField(db_column='meanTempSer')  # Field name made lowercase.
     variancetempser = models.FloatField(db_column='varianceTempSer')  # Field name made lowercase.
     standarddeviationtempser = models.FloatField(db_column='standardDeviationTempSer')  # Field name made lowercase.

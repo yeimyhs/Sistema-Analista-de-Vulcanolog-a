@@ -69,14 +69,14 @@ class MeteorologicalDataPertTime(generics.GenericAPIView):
 class TempSeriesPerTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
 
-    def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
+    def get(self, request, idstation, starttime, finishtime, ideventtype, value='waveskewnesstempser'):
         try:
             idstation = idstation
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
-            TSs_within_interval = Temporaryseries.objects.filter(statetempser=1).filter(
+            TSs_within_interval = Temporaryseries.objects.filter(ideventtype=ideventtype).filter(statetempser=1).filter(
                 Q(idstation=idstation),
                 starttimetempser__gte=starttime,
                 starttimetempser__lte=finishtime
@@ -99,14 +99,14 @@ class MaskImgRawPerTime(generics.GenericAPIView):
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
-            masks_within_interval = Mask.objects.filter.filter(statemask=1)(
+            masks_within_interval = Mask.objects.filter(statemask=1).filter(
                 Q(idmask__idstation=idstation),
                 starttimemask__gte=starttime,
                 starttimemask__lte=finishtime
             )
             results = []
             for mask in masks_within_interval:
-                segmentation_image = Imagesegmentation.objects.get(idphoto=mask.idmask.idphoto)
+                segmentation_image = Imagesegmentation.objects.filter(stateimg=1).get(idphoto=mask.idmask.idphoto)
                 results.append({
                     'mask': MaskSerializer(mask).data,
                     'segmentation_image': ImagesegmentationSerializer(segmentation_image).data
@@ -255,9 +255,10 @@ class MeteorologicaldataViewSet(ModelViewSet):
 class StationViewSet(ModelViewSet):
     queryset = Station.objects.filter(statestat=1).order_by('pk')
     serializer_class = StationSerializer
-    
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
+
     def all(self, request):
-        queryset = Station.objects.all()
+        queryset = Station.objects.filter(statestat=1)
         data = StationSerializer(queryset, many=True).data
         return Response(data)
     
@@ -278,7 +279,7 @@ class UserPViewSet(ModelViewSet):
     filterset_class = volcanoApp.filters.UserPFilter 
 
     def all(self, request):
-        queryset = UserP.objects.all()
+        queryset = UserP.objects.filter(state=1)
         data = UserPSerializer(queryset, many=True).data
         return Response(data)
 
@@ -316,6 +317,6 @@ class VolcanoViewSet(ModelViewSet):
     serializer_class = VolcanoSerializer
     
     def all(self, request):
-        queryset = Volcano.objects.all()
+        queryset = Volcano.objects.filter(statevol=1)
         data = VolcanoSerializer(queryset, many=True).data
         return Response(data)
