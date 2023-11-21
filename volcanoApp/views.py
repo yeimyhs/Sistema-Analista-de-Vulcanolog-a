@@ -92,7 +92,7 @@ class TempSeriesPerTime(generics.GenericAPIView):
 class MaskImgRawPerTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
 
-    def get(self, request, idstation, starttime, time):
+    def get(self, request, idstation, starttime, finishtime):
         try:
             idstation = idstation
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')

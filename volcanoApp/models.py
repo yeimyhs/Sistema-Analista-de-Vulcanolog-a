@@ -126,7 +126,7 @@ class Meteorologicaldata(models.Model):
     temperaturemet = models.FloatField(db_column='temperatureMet')  # Field name made lowercase.
     geopotentialheightmet = models.FloatField(db_column='geopotentialHeightMet')  # Field name made lowercase.
     indmet = models.IntegerField(db_column='indMet', blank=True, null=True)  # Field name made lowercase.
-    jsonidmet = models.BigIntegerField(db_column='jsonIdMet',)  # Field name made lowercase.
+    jsonmet = models.JSONField(db_column='jsonMet',)  # Field name made lowercase.
     #idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano', blank=True, null=True)  # Field name made lowercase.
     idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
     idtemporaryseries = models.ForeignKey('Temporaryseries', models.DO_NOTHING, db_column='idTemporarySeries', blank=True, null=True)  # Field name made lowercase.                                                        5                                                                                                                                                                                                                                                      = models.ForeignKey('Temporaryseries', models.DO_NOTHING, db_column='idTemporarySeries', blank=True, null=True)  # Field name made lowercase.

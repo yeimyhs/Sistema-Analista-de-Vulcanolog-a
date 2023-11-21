@@ -1,3 +1,8 @@
+'''from __future__ import print_function
+import gammu
+import sys
+pip install python-gammu https://pypi.org/project/python-gammu/
+'''
 from rest_framework.serializers import ModelSerializer
 from volcanoApp.models import Alert, Alertconfiguration, Blob, Eventtype, History, Imagesegmentation, Mask, Meteorologicaldata, Station, Temporaryseries, Volcano\
 , UserP, Mapping
@@ -213,39 +218,43 @@ class ImagesegmentationSerializer(ModelSerializer):
         model = Imagesegmentation
         fields = '__all__'
 
+
+
+
 import requests
 from django.conf import settings
 from firebase_admin import auth
 from firebase_admin import messaging
 #from twilio.rest import Client
 #client = Client(settings.TWILIO_WSP_ACCOUNT_SID, settings.TWILIO_WSP_AUTH_TOKEN)
-from firebase_admin import messaging
 
-def send_sms_messages(message_text):
-    #usuarios_tipo_especifico = UserP.objects.all#UserP.objects.filter(type=tipo_usuario)
-    phone_numbers = list(UserP.objects.values_list('phone', flat=True))
-    print("-------------", phone_numbers)
-    phone_numbers = ["eyJhbGciOiJSUzI1NiIsImtpZCI6IjQ0ZmJkZTdhZGY0ZTU3YWYxZWE4MzAzNmJmZjdkMzUxNTk3ZTMzNWEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vcHJveWVjdG8tc2FiYW5jYXlhIiwiYXVkIjoicHJveWVjdG8tc2FiYW5jYXlhIiwiYXV0aF90aW1lIjoxNzAwMDE4NTc4LCJ1c2VyX2lkIjoiVndSRktUOHZwOVZLRmlqcXJoSmpiaVJNSzZJMyIsInN1YiI6IlZ3UkZLVDh2cDlWS0ZpanFyaEpqYmlSTUs2STMiLCJpYXQiOjE3MDAwMTg1NzgsImV4cCI6MTcwMDAyMjE3OCwiZW1haWwiOiJqdWFuQHRlc3QuY29tIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJmaXJlYmFzZSI6eyJpZGVudGl0aWVzIjp7ImVtYWlsIjpbImp1YW5AdGVzdC5jb20iXX0sInNpZ25faW5fcHJvdmlkZXIiOiJwYXNzd29yZCJ9fQ.JaS8IBu5aYMW2V0TTjxKZCe-6VnHYS2saxOOlRX-E7y5H1DsrwLFibH8s5IX88xE4KfMRjgvjqIxj2VzSxzM5v9Ts76mHof_s6bAFRBLlbzkftKfp9jDbMvWF1h3ogBlm2Aldw-AcLl4mgsY2wCS1Oi0t1_xZ6aCfQuwkG_hg2Pnm3IfMUUKySblzeuERXSaJGY_mzmlCFMAvX-NzPwnF_pMaecfXzmgp8zbC0mZQLq2hpIsqzlzwTO8Czx3Br81lz4WRJ4eIpQlh84ZFah4k1C1kLmjVvckFEKT0HTFfIS2EDNpi_etonqt0MVA-OxcvgYFSjX5VRnokEiKo7u3uw"]
-    for phone_number in phone_numbers:
-        '''# Verificar si el número de teléfono tiene 9 dígitos (formato peruano)
-        if len(phone_number) != 9:
-            print(f"Número de teléfono no válido para Perú ({phone_number})")
-            continue'''
-   
-        # Construir el mensaje
-        message = messaging.Message(
-            data={
-                'message': message_text,
-            },
-            token=phone_number  # Enviar el mensaje al número de teléfono
-        )
+'''
+def send_sms_messages(recipients, message_text):
+    # Create object for talking with phone
+    state_machine = gammu.StateMachine()
 
-        # Enviar el mensaje
-        try:
-            response = messaging.send(message)
-            print(f"Mensaje enviado a {phone_number} exitosamente:", response)
-        except Exception as e:
-            print(f"Error al enviar el mensaje a {phone_number}:", e)
+    # Optionally load config file as defined by first parameter
+    if len(sys.argv) > 1:
+        # Read the configuration from given file
+        state_machine.ReadConfig(Filename=sys.argv[1])
+    else:
+        # Read the configuration (~/.gammurc)
+        state_machine.ReadConfig()
+
+    # Connect to the phone
+    state_machine.Init()
+
+    for recipient in recipients:
+        # Prepare message data for each recipient
+        message = {
+            "Text": message_text,
+            "SMSC": {"Location": 1},
+            "Number": recipient,
+        }
+
+        # Send the message to the current recipient
+        state_machine.SendSMS(message)
+'''
 
 class MaskSerializer(ModelSerializer):
 
@@ -281,7 +290,8 @@ class MaskSerializer(ModelSerializer):
                     to=['whatsapp:+51973584851']
                     )
                 '''
-                #send_sms_messages(alertconf.messagetemplateconfalert)
+                phone_numbers = list(UserP.objects.values_list('phone', flat=True))
+                #########send_sms_messages(phone_numbers,alertconf.messagetemplateconfalert)
                 nueva_alerta.save()
 
 
