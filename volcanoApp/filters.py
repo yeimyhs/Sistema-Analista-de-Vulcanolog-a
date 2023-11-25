@@ -1,5 +1,5 @@
 import django_filters
-from volcanoApp.models import Alert, Alertconfiguration, Blob, Eventtype, History, Imagesegmentation, Mask, Meteorologicaldata, Station, Temporaryseries, Volcano \
+from volcanoApp.models import Alert, Alertconfiguration, Blob, Eventtype, History, Imagesegmentation, Mask, Station, Temporaryseries, Volcano \
     , UserP
 class UserPFilter(django_filters.FilterSet):
     names = django_filters.CharFilter(lookup_expr='icontains')

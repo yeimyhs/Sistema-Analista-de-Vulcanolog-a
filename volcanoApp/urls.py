@@ -41,10 +41,10 @@ urlpatterns = [
    
    #path("password_change", views.password_change, name="password_change"),
    path("maskimgrawpertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.MaskImgRawPerTime.as_view(), name="MaskImgRawPerTime"),
-   path("tempseriespertime/<str:idstation>/<str:ideventtype>/<str:value>/<str:starttime>/<str:finishtime>", views.TempSeriesPerTime.as_view(), name="TempSeriesPerTime"),
-   path("tempseriespertime/<str:idstation>/<str:ideventtype>/<str:starttime>/<str:finishtime>", views.TempSeriesPerTime.as_view(), name="TempSeriesPerTime"),
-   path("meteorologicaldatapertime/<str:idstation>/<str:value>/<str:starttime>/<str:finishtime>", views.MeteorologicalDataPertTime.as_view(), name="MeteorologicalDataPertTime"),
-   path("meteorologicaldatapertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.MeteorologicalDataPertTime.as_view(), name="MeteorologicalDataPertTime"),
+   path("tempseriespertime/<str:idstation>/<str:value>/<str:starttime>/<str:finishtime>", views.TempSeriesPerTime.as_view(), name="TempSeriesPerTime"),
+   path("tempseriespertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.TempSeriesPerTime.as_view(), name="TempSeriesPerTime"),
+   ##path("meteorologicaldatapertime/<str:idstation>/<str:value>/<str:starttime>/<str:finishtime>", views.MeteorologicalDataPertTime.as_view(), name="MeteorologicalDataPertTime"),
+   ##path("meteorologicaldatapertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.MeteorologicalDataPertTime.as_view(), name="MeteorologicalDataPertTime"),
    path('all/alertconfiguration/', views.AlertconfigurationViewSet.as_view({'get': 'all'}), name='alertconfigurations-all'),
    path('all/userp/', views.UserPViewSet.as_view({'get': 'all'}), name='userp-all'),
    path('all/station/', views.StationViewSet.as_view({'get': 'all'}), name='station-all'),
@@ -65,7 +65,9 @@ router.register(r'eventtype', views.EventtypeViewSet)
 router.register(r'history', views.HistoryViewSet)
 router.register(r'imagesegmentation', views.ImagesegmentationViewSet)
 router.register(r'mask', views.MaskViewSet)
-router.register(r'meteorologicaldata', views.MeteorologicaldataViewSet)
+router.register(r'ashdispersion', views.AshdispersionViewSet)
+router.register(r'ashfallprediction', views.AshfallpredictionViewSet)
+router.register(r'winddirection', views.WinddirectionViewSet)
 router.register(r'station', views.StationViewSet)
 router.register(r'temporaryseries', views.TemporaryseriesViewSet)
 router.register(r'userp', views.UserPViewSet)

@@ -1,8 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
-from volcanoApp.serializers import AlertSerializer, AlertconfigurationSerializer, BlobSerializer, EventtypeSerializer, HistorySerializer, ImagesegmentationSerializer, MaskSerializer, MeteorologicaldataSerializer, StationSerializer, TemporaryseriesSerializer, VolcanoSerializer \
-    , UserPSerializer ,MappingSerializer
-from volcanoApp.models import Alert, Alertconfiguration, Blob, Eventtype, History, Imagesegmentation, Mask, Meteorologicaldata, Station, Temporaryseries, Volcano \
-    , UserP, Mapping
+from volcanoApp.serializers import AlertSerializer, AlertconfigurationSerializer, BlobSerializer, EventtypeSerializer, HistorySerializer, ImagesegmentationSerializer, MaskSerializer, StationSerializer, TemporaryseriesSerializer, VolcanoSerializer \
+    , UserPSerializer ,MappingSerializer, AshdispersionSerializer, WinddirectionSerializer, AshfallpredictionSerializer
+from volcanoApp.models import Alert, Alertconfiguration, Blob, Eventtype, History, Imagesegmentation, Mask, Station, Temporaryseries, Volcano \
+    , UserP, Mapping, Ashdispersion, Ashfallprediction, Winddirection
 import volcanoApp.filters  
 from django.contrib.auth.models import User
 from rest_framework import viewsets, filters
@@ -44,7 +44,7 @@ from rest_framework.response import Response
 from .models import Mask, Imagesegmentation
 #----------------------------------------------------------------------MaskImgRawPerTime
 
-class MeteorologicalDataPertTime(generics.GenericAPIView):
+'''class MeteorologicalDataPertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
 
     def get(self, request, idstation, starttime, finishtime,value= "vmet"):
@@ -65,24 +65,24 @@ class MeteorologicalDataPertTime(generics.GenericAPIView):
             return Response({'results': response_data})
         except Exception as e:
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
-
+'''
 class TempSeriesPerTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
 
-    def get(self, request, idstation, starttime, finishtime, ideventtype, value='waveskewnesstempser'):
+    def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
         try:
             idstation = idstation
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
-            TSs_within_interval = Temporaryseries.objects.filter(ideventtype=ideventtype).filter(statetempser=1).filter(
+            TSs_within_interval = Temporaryseries.objects.filter(statetempser=1).filter(
                 Q(idstation=idstation),
                 starttimetempser__gte=starttime,
                 starttimetempser__lte=finishtime
             )
             serializer = TemporaryseriesSerializer(TSs_within_interval, many=True)
-            response_data = [{'starttimetempser': item['starttimetempser'], 'value': item[value]} for item in serializer.data]
+            response_data = [{'starttimetempser': item['starttimetempser'], 'value': item[value], 'type' : item['ideventtype']} for item in serializer.data]
 
             return Response({'results': response_data})
         except Exception as e:
@@ -245,11 +245,23 @@ class ImagesegmentationViewSet(ModelViewSet):
 class MaskViewSet(ModelViewSet):
     queryset = Mask.objects.filter(statemask=1).order_by('pk')
     serializer_class = MaskSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     #pagination_class = None
 
-class MeteorologicaldataViewSet(ModelViewSet):
-    queryset = Meteorologicaldata.objects.filter(statemet=1).order_by('pk')
-    serializer_class = MeteorologicaldataSerializer
+class AshdispersionViewSet(ModelViewSet):
+    queryset = Ashdispersion.objects.filter(statemet=1).order_by('pk')
+    serializer_class = AshdispersionSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
+
+class AshfallpredictionViewSet(ModelViewSet):
+    queryset = Ashfallprediction.objects.filter(statemet=1).order_by('pk')
+    serializer_class = AshfallpredictionSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
+
+class WinddirectionViewSet(ModelViewSet):
+    queryset = Winddirection.objects.filter(statemet=1).order_by('pk')
+    serializer_class = WinddirectionSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
 
 
 class StationViewSet(ModelViewSet):
@@ -264,6 +276,7 @@ class StationViewSet(ModelViewSet):
     
 class TemporaryseriesViewSet(ModelViewSet):
     queryset = Temporaryseries.objects.filter(statetempser=1).order_by('pk')
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     serializer_class = TemporaryseriesSerializer
 
 class MappingViewSet(ModelViewSet):
@@ -314,6 +327,7 @@ class UserPViewSet(ModelViewSet):
 
 class VolcanoViewSet(ModelViewSet):
     queryset = Volcano.objects.filter(statevol=1).order_by('pk')
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     serializer_class = VolcanoSerializer
     
     def all(self, request):
