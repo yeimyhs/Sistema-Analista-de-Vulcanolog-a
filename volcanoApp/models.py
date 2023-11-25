@@ -197,8 +197,8 @@ class Ashdispersion(models.Model):
     urlfileashdisp = models.TextField(db_column='urlfileAshdisp')  # Field name made lowercase.
     idnoticeashdisp  = models.CharField(max_length=10,db_column='idNoticeAshdisp')  # Field name made lowercase.
     idtypeashdisp  =models.CharField(max_length=20, choices=OPCIONES)
-    statemet = models.SmallIntegerField(db_column='stateMet')  # Field name made lowercase.
-    datecreationmet = models.DateTimeField(db_column='dateCreationMet',auto_now_add=True)  # Field name made lowercase.
+    stateashdisp = models.SmallIntegerField(db_column='stateAshdisp')  # Field name made lowercase.
+    datecreationashdisp = models.DateTimeField(db_column='dateCreationAshdisp',auto_now_add=True)  # Field name made lowercase.
 
     class Meta:
         db_table = 'AshDispersion'

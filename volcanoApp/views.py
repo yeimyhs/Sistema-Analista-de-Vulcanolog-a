@@ -249,17 +249,17 @@ class MaskViewSet(ModelViewSet):
     #pagination_class = None
 
 class AshdispersionViewSet(ModelViewSet):
-    queryset = Ashdispersion.objects.filter(statemet=1).order_by('pk')
+    queryset = Ashdispersion.objects.filter(stateashdisp=1).order_by('pk')
     serializer_class = AshdispersionSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
 
 class AshfallpredictionViewSet(ModelViewSet):
-    queryset = Ashfallprediction.objects.filter(statemet=1).order_by('pk')
+    queryset = Ashfallprediction.objects.filter(stateashfall=1).order_by('pk')
     serializer_class = AshfallpredictionSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
 
 class WinddirectionViewSet(ModelViewSet):
-    queryset = Winddirection.objects.filter(statemet=1).order_by('pk')
+    queryset = Winddirection.objects.filter(statewinddir=1).order_by('pk')
     serializer_class = WinddirectionSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
 
