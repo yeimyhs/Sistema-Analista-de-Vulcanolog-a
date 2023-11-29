@@ -256,6 +256,8 @@ class mailer(APIView):
 class AlertViewSet(ModelViewSet):
     queryset = Alert.objects.filter(statealert=1).order_by('pk')
     serializer_class = AlertSerializer
+    filterset_class = volcanoApp.filters.AlertFilter 
+
 '''    pagination_class = CustomPagination 
 
     def list(self, request, *args, **kwargs):
@@ -266,7 +268,6 @@ class AlertconfigurationViewSet(ModelViewSet):
     queryset = Alertconfiguration.objects.filter(statealertconf=1).order_by('pk')
     serializer_class = AlertconfigurationSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
-    filterset_class = volcanoApp.filters.AlertFilter 
 
     
     def all(self, request):
