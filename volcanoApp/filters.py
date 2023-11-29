@@ -25,3 +25,41 @@ class UserPFilter(django_filters.FilterSet):
             'datecreation',
             'type',
         ]
+
+
+
+class VolcanoFilter(django_filters.FilterSet):
+    class Meta:
+        model = Volcano
+        fields = ['shortnamevol', 
+                  'longnamevol', 
+                  'descriptionvol', 
+                  'altitudevol', 'pwavespeedvol', 'densityvol', 'attcorrectfactorvol']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.filters.items():
+            if isinstance(field, django_filters.CharFilter):
+                field.lookup_expr = 'icontains'
+
+class StationFilter(django_filters.FilterSet):
+    class Meta:
+        model = Station
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.filters.items():
+            if isinstance(field, django_filters.CharFilter):
+                field.lookup_expr = 'icontains'
+
+class AlertFilter(django_filters.FilterSet):
+    class Meta:
+        model = Alert
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.filters.items():
+            if isinstance(field, django_filters.CharFilter):
+                field.lookup_expr = 'icontains'

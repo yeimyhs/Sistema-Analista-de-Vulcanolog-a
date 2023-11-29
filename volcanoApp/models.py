@@ -33,7 +33,7 @@ class Alert(models.Model):
 
 
 class Alertconfiguration(models.Model):
-    idalertconf = models.BigAutoField(db_column='idAlertConf', primary_key=True, blank= True)  # Field name made lowercase.
+    idalertconf = models.CharField(max_length=24,db_column='idAlertConf', primary_key=True, blank= True)  # Field name made lowercase.
     altitudalertconf = models.FloatField(db_column='altitudAlertConf')  # Field name made lowercase.
     statealertconf = models.IntegerField(db_column='stateAlertConf')  # Field name made lowercase.
     datecreationalertconf = models.TimeField(db_column='dateCreationAlertConf',auto_now_add=True)  # Field name made lowercase.
@@ -148,10 +148,11 @@ class Mask(models.Model):#SABCAJA20230822020000
     directionmask = models.TextField(db_column='directionmask')  # Field name made lowercase.
     heighmask = models.FloatField(db_column='heighmask')  # Field name made lowercase.
     statemask = models.SmallIntegerField(db_column='statemask')  # Field name made lowercase.
+    idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
 
     class Meta:
         db_table = 'Mask'
-
+#no tiene auto generador de id porque su id es un imageraw
 
 class Winddirection(models.Model):
     starttimewinddir = models.DateTimeField(db_column='startTimeWinddir')  # Field name made lowercase.
@@ -177,7 +178,9 @@ class Winddirection(models.Model):
 class Ashfallprediction(models.Model):
     idashfallprediction = models.CharField(max_length=21,db_column='idAshfallprediction', primary_key=True)  # Field name made lowercase.
     idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano', blank=True, null=True)  # Field name made lowercase.
-    #typeashfall = 
+    typeashfall = models.CharField(max_length=3,db_column='typeAshfall') 
+
+    jsonbodyashfall = models.JSONField(db_column='jsonbodyAshfall',)  # Field name made lowercase.
     #bodyashfall =
     starttimeashfall = models.DateTimeField(db_column='startTimeAshfall')  # Field name made lowercase.
     stateashfall = models.SmallIntegerField(db_column='stateAshfall')  # Field name made lowercase.
@@ -196,7 +199,7 @@ class Ashdispersion(models.Model):
     starttimeashdisp = models.DateTimeField(db_column='startTimeAshdisp')  # Field name made lowercase.
     urlfileashdisp = models.TextField(db_column='urlfileAshdisp')  # Field name made lowercase.
     idnoticeashdisp  = models.CharField(max_length=10,db_column='idNoticeAshdisp')  # Field name made lowercase.
-    idtypeashdisp  =models.CharField(max_length=20, choices=OPCIONES)
+    idtypeashdisp  =models.CharField(max_length=10, choices=OPCIONES,db_column='idTypeAshdisp')
     stateashdisp = models.SmallIntegerField(db_column='stateAshdisp')  # Field name made lowercase.
     datecreationashdisp = models.DateTimeField(db_column='dateCreationAshdisp',auto_now_add=True)  # Field name made lowercase.
 
@@ -207,7 +210,6 @@ class Station(models.Model):
     standardnamestat = models.CharField(db_column='standardNameStat', max_length=64)  # Field name made lowercase.
     shortnamestat = models.CharField(db_column='shortNameStat', max_length=20)  # Field name made lowercase.
     longnamestat = models.CharField(db_column='longNameStat', max_length=126)  # Field name made lowercase.
-    starttimestat = models.DateTimeField(db_column='startTimeStat')  # Field name made lowercase.
     latitudestat = models.FloatField(db_column='latitudeStat')  # Field name made lowercase.
     longitudestat = models.FloatField(db_column='longitudeStat')  # Field name made lowercase.
     altitudestat = models.FloatField(db_column='altitudeStat')  # Field name made lowercase.

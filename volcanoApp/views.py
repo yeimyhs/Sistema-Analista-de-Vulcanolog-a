@@ -42,6 +42,55 @@ from django.db.models import Q
 from rest_framework import generics
 from rest_framework.response import Response
 from .models import Mask, Imagesegmentation
+
+#----------------------------------------------------------------------password reset imports
+from django.shortcuts import render, redirect
+from django.core.mail import send_mail, BadHeaderError
+from django.http import HttpResponse
+from django.contrib.auth.forms import PasswordResetForm
+from django.contrib.auth.models import User
+from django.template.loader import render_to_string
+from django.db.models.query_utils import Q
+from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.encoding import force_bytes
+from django.contrib import messages
+
+from django.core import mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+#----------------------------------------------------------------------password reset
+def password_reset_request(request):
+	if request.method == "POST":
+		password_reset_form = PasswordResetForm(request.POST)
+		if password_reset_form.is_valid():
+			data = password_reset_form.cleaned_data['email']
+			associated_users = User.objects.filter(Q(email=data))
+			if associated_users.exists():
+				for user in associated_users:
+					subject = "Solicitud de restablecimiento de contraseña"
+					email_template_name = "password_reset/password_reset_email.html"
+					c = {
+					"email":user.email,
+					'domain':settings.DOMAIN,
+					'site_name': 'Diverticuentos',
+					"uid": urlsafe_base64_encode(force_bytes(user.pk)),
+					"user": user,
+					'token': default_token_generator.make_token(user),
+					'protocol': 'http',
+					}
+					email = render_to_string(email_template_name, c)
+                    
+					try:
+						send_mail(subject, strip_tags(email), settings.EMAIL_HOST_USER , [user.email], html_message=email)
+					except BadHeaderError:
+						return HttpResponse('Envio no realizado')
+                    
+					return redirect ("/volcanoApp/password_reset/done/")
+            
+	password_reset_form = PasswordResetForm()
+	return render(request=request, template_name="password_reset/password_reset.html", context={"password_reset_form":password_reset_form})
+
 #----------------------------------------------------------------------MaskImgRawPerTime
 
 '''class MeteorologicalDataPertTime(generics.GenericAPIView):
@@ -216,6 +265,9 @@ class AlertViewSet(ModelViewSet):
 class AlertconfigurationViewSet(ModelViewSet):
     queryset = Alertconfiguration.objects.filter(statealertconf=1).order_by('pk')
     serializer_class = AlertconfigurationSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
+    filterset_class = volcanoApp.filters.AlertFilter 
+
     
     def all(self, request):
         queryset = Alertconfiguration.objects.all()
@@ -268,6 +320,7 @@ class StationViewSet(ModelViewSet):
     queryset = Station.objects.filter(statestat=1).order_by('pk')
     serializer_class = StationSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
+    filterset_class = volcanoApp.filters.StationFilter 
 
     def all(self, request):
         queryset = Station.objects.filter(statestat=1)
@@ -278,7 +331,6 @@ class TemporaryseriesViewSet(ModelViewSet):
     queryset = Temporaryseries.objects.filter(statetempser=1).order_by('pk')
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     serializer_class = TemporaryseriesSerializer
-
 class MappingViewSet(ModelViewSet):
     queryset = Mapping.objects.order_by('pk')
     serializer_class = MappingSerializer
@@ -329,7 +381,13 @@ class VolcanoViewSet(ModelViewSet):
     queryset = Volcano.objects.filter(statevol=1).order_by('pk')
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     serializer_class = VolcanoSerializer
-    
+    filterset_class = volcanoApp.filters.VolcanoFilter    
+    search_fields = ['shortnamevol', 
+                  'longnamevol', 
+                  'descriptionvol', 
+                  'altitudevol', 'pwavespeedvol', 'densityvol', 'attcorrectfactorvol']
+
+
     def all(self, request):
         queryset = Volcano.objects.filter(statevol=1)
         data = VolcanoSerializer(queryset, many=True).data

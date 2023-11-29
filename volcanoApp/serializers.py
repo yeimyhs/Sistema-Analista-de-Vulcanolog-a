@@ -42,6 +42,7 @@ def create_user_and_profile(validated_data):
         country=validated_data.get('country', ''),
         city=validated_data.get('city', ''),
         imagecover=validated_data.get('imagecover', ''),
+        imageprofile=validated_data.get('imageprofile', ''),
         comment=validated_data['comment'],
     )
     user_profile.save()
@@ -76,6 +77,7 @@ class UserPSerializer(serializers.ModelSerializer):
             'datecreation',
             'type',
             'comment',
+            'imageprofile',
             'phone'
         ]
 
@@ -101,6 +103,7 @@ def create_user_and_profile(validated_data):
         country=validated_data.get('country', ''),
         city=validated_data.get('city', ''),
         imagecover=validated_data.get('imagecover', ''),
+        imageprofile=validated_data.get('imageprofile', ''),
         comment=validated_data['comment'],
         phone=validated_data['phone'],
         
@@ -138,6 +141,7 @@ class UserPSerializer(ModelSerializer):
         'datecreation',
         'type',
         'comment',
+        'imageprofile',
         'imagecover',
         'phone'
         ]
@@ -163,15 +167,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         # Extrae el valor de 'names'
         user, user_profile = create_user_and_profile(validated_data)
-        try:
-                userf = auth.create_user(
-                    email=user.email,
-                    email_verified=False,
-                    phone_number=user_profile.phone,
-                )
-                print (userf.uid)
-        except FirebaseError as e:
-            print(e)
+
         return user, user_profile
        
  

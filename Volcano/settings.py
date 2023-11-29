@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'knox',
     'rest_framework.authtoken',
     'django_filters',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [

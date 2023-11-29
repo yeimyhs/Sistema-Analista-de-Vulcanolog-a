@@ -20,8 +20,13 @@ from django.conf.urls import include
 
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
+
 urlpatterns = [
     path('volcanoApp/admin/', admin.site.urls),
     path('volcanoApp/', include(('volcanoApp.urls','volcanoApp'))),
+    
+    path('reset/password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(
+       template_name='password_reset/password_reset_complete.html'), name='password_reset_complete'),   
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

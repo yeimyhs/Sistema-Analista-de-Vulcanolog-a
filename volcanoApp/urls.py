@@ -8,8 +8,11 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 #------------------------------------------------------------------------------knox imports
 from knox import views as knox_views
+from django.contrib.auth import views as auth_views
 
 #------------------------------------------------------------------------------documentacion
+app_name = 'volcanoApp'
+
 schema_view = get_schema_view(
    openapi.Info(
       title="Volcanov1 API",
@@ -33,6 +36,15 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
+    path("password_reset/", views.password_reset_request, name="password_reset"),
+    path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(
+       template_name='password_reset/password_reset_done.html'), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
+       template_name="password_reset/password_reset_confirm.html"), name='password_reset_confirm'),
+    path('reset/password_reset_complete/', auth_views.PasswordResetCompleteView.as_view(
+       template_name='password_reset/password_reset_complete.html'), name='password_reset_complete'),      
+ 
+
     path('register/', views.RegisterAPI.as_view(), name='register'),
     path('login/', views.LoginAPI.as_view(), name='login'),
     path('logout/', decorated_logout_view, name='logout'),
