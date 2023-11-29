@@ -236,7 +236,7 @@ class mailer(APIView):
         subject= request.data["subject"]
         message= request.data["message"] + " " + request.data["email"]
         from_email= settings.EMAIL_HOST_USER
-        recipient_list= request.data["email"]
+        recipient_list= request.data[settings.EMAIL_HOST_USER]
         '''{
         "subject":"subject",
         "message":"message",
