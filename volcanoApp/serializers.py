@@ -125,7 +125,6 @@ class UserSerializer(ModelSerializer):
         user, user_profile = create_user_and_profile(validated_data)
         return user
 
-
 class UserPSerializer(ModelSerializer):
     class Meta:
         model = UserP

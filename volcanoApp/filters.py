@@ -63,3 +63,14 @@ class AlertFilter(django_filters.FilterSet):
         for name, field in self.filters.items():
             if isinstance(field, django_filters.CharFilter):
                 field.lookup_expr = 'icontains'
+
+class AlertConfFilter(django_filters.FilterSet):
+    class Meta:
+        model = Alertconfiguration
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.filters.items():
+            if isinstance(field, django_filters.CharFilter):
+                field.lookup_expr = 'icontains'

@@ -63,6 +63,7 @@ MIDDLEWARE = [
 
 ]
 
+
 ROOT_URLCONF = 'Volcano.urls'
 
 TEMPLATES = [

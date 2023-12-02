@@ -47,7 +47,7 @@ class Alertconfiguration(models.Model):
         db_table = 'AlertConfiguration'
     def generate_default_idalertconf(self):
         VVVV = self.idvolcano.shortnamevol[:4].upper() if self.idvolcano.shortnamevol else 'VVVV'
-        ccc = Blob.objects.filter(idblob__startswith=f"{VVVV}").count()
+        ccc = Alertconfiguration.objects.filter(idalertconf__startswith=f"{VVVV}").count()
         return f"{VVVV}{ccc:03d}"
 
     def save(self, *args, **kwargs):
@@ -179,7 +179,7 @@ class Winddirection(models.Model):
         now = timezone.now()
         date_time = now.strftime('%Y%m%d%H%M%S')
         VVV = self.idvolcano.shortnamevol[:3].upper() if self.idvolcano.shortnamevol else 'VVV'
-        cc = Blob.objects.filter(idwinddirection__startswith=f"{VVV}{date_time}").count()
+        cc = Winddirection.objects.filter(idwinddirection__startswith=f"{VVV}{date_time}").count()
         return f"{VVV}{date_time}{cc:02d}"
     
     def save(self, *args, **kwargs):
@@ -349,6 +349,8 @@ class UserP(models.Model):
 
     class Meta:
         db_table = 'User'
+    def __str__(self):
+        return self.email
     
 class Volcano(models.Model):
     shortnamevol = models.CharField(db_column='shortNameVol', max_length=20)  # Field name made lowercase.

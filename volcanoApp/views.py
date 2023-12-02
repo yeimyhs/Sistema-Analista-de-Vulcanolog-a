@@ -60,37 +60,48 @@ from django.core import mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 #----------------------------------------------------------------------password reset
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
+from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view, permission_classes
+import json
+@api_view(['POST'])
+@permission_classes([AllowAny])
 def password_reset_request(request):
-	if request.method == "POST":
-		password_reset_form = PasswordResetForm(request.POST)
-		if password_reset_form.is_valid():
-			data = password_reset_form.cleaned_data['email']
-			associated_users = User.objects.filter(Q(email=data))
-			if associated_users.exists():
-				for user in associated_users:
-					subject = "Solicitud de restablecimiento de contraseña"
-					email_template_name = "password_reset/password_reset_email.html"
-					c = {
-					"email":user.email,
-					'domain':settings.DOMAIN,
-					'site_name': 'Diverticuentos',
-					"uid": urlsafe_base64_encode(force_bytes(user.pk)),
-					"user": user,
-					'token': default_token_generator.make_token(user),
-					'protocol': 'http',
-					}
-					email = render_to_string(email_template_name, c)
-                    
-					try:
-						send_mail(subject, strip_tags(email), settings.EMAIL_HOST_USER , [user.email], html_message=email)
-					except BadHeaderError:
-						return HttpResponse('Envio no realizado')
-                    
-					return redirect ("/volcanoApp/password_reset/done/")
-            
-	password_reset_form = PasswordResetForm()
-	return render(request=request, template_name="password_reset/password_reset.html", context={"password_reset_form":password_reset_form})
+    if request.method == "POST":
+        try:
+            json_data = json.loads(request.body)
+            email = json_data.get('email', '')  # Obtener el correo electrónico del payload JSON
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Datos JSON inválidos"})
 
+        print(email)
+        associated_users = User.objects.filter(Q(email=email))
+        print(associated_users)
+        if associated_users.exists():
+            
+            for user in associated_users:
+                subject = "Solicitud de restablecimiento de contraseña"
+                email_template_name = "password_reset/password_reset_email.html"
+                c = {
+                "email":user.email,
+                'domain':settings.DOMAIN,
+                'site_name': 'VolcanoApp',
+                "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                "user": user,
+                'token': default_token_generator.make_token(user),
+                'protocol': 'http',
+                }
+                email_con = render_to_string(email_template_name, c)
+            try:
+                send_mail(subject, strip_tags(email_con), settings.EMAIL_HOST_USER, [user.email], html_message=email_con)
+                return JsonResponse({"message": "Correo de restablecimiento de contraseña enviado correctamente"})
+            except BadHeaderError:
+                return JsonResponse({"error": "Envío no realizado"})
+        return JsonResponse({"error": "Solicitud inválida"})
+
+    return JsonResponse({"error": "Solicitud inválida"})
 #----------------------------------------------------------------------MaskImgRawPerTime
 
 '''class MeteorologicalDataPertTime(generics.GenericAPIView):
@@ -137,6 +148,28 @@ class TempSeriesPerTime(generics.GenericAPIView):
         except Exception as e:
             return Response({'error': str(e)})
 #----------------------------------------------------------------------MaskImgRawPerTime
+'''class BlobsStationperMask(generics.GenericAPIView):
+    queryset = []  # Define una consulta ficticia
+
+    def get(self, request, idmask):
+        try:
+            blobs = Blob.objects.filter(statemask=1).filter(
+                Q(idmask__idstation=idstation),
+                starttimemask__gte=starttime,
+                starttimemask__lte=finishtime           
+            )
+            results = []
+            for mask in masks_within_interval:
+                segmentation_image = Imagesegmentation.objects.filter(stateimg=1).get(idphoto=mask.idmask.idphoto)
+                results.append({
+                    'mask': MaskSerializer(mask).data,
+                    'segmentation_image': ImagesegmentationSerializer(segmentation_image).data
+                })
+            return Response({'results': results})
+        except Exception as e:
+            return Response({'error': str(e)})'
+			'''
+#----------------------------------------------------------------------MaskImgRawPerTime
 
 class MaskImgRawPerTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
@@ -178,13 +211,26 @@ class RegisterAPI(generics.GenericAPIView):
         "token": AuthToken.objects.create(user)[1]
         })
 #----------------------------------------------------------------------Login
+from knox.views import LoginView as KnoxLoginView
+from rest_framework.response import Response
+
 class LoginAPI(KnoxLoginView):
     
     permission_classes = (permissions.AllowAny,)
     @swagger_auto_schema( request_body=AuthTokenSerializer)
 
     def post(self, request, format=None):
-        serializer = AuthTokenSerializer(data=request.data)
+        print(request.data)
+        email = request.data.get('email', None)
+        password = request.data.get('password', None)
+
+        if email and password:
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                return Response({'error': 'Credenciales inválidas.'}, status=400)
+        datas= {'username': user.username, 'password': password}
+        serializer = AuthTokenSerializer(data=datas)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         login(request, user)
@@ -236,7 +282,7 @@ class mailer(APIView):
         subject= request.data["subject"]
         message= request.data["message"] + " " + request.data["email"]
         from_email= settings.EMAIL_HOST_USER
-        recipient_list= request.data[settings.EMAIL_HOST_USER]
+        recipient_list= settings.EMAIL_HOST_USER
         '''{
         "subject":"subject",
         "message":"message",
@@ -268,6 +314,11 @@ class AlertconfigurationViewSet(ModelViewSet):
     queryset = Alertconfiguration.objects.filter(statealertconf=1).order_by('pk')
     serializer_class = AlertconfigurationSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
+    filterset_class = volcanoApp.filters.AlertConfFilter 
+    search_fields = ['idalertconf', 
+                  'idvolcano__longnamevol', 
+                  'notificationalertconf', 
+                  'messagetemplateconfalert',]
 
     
     def all(self, request):
@@ -386,7 +437,10 @@ class VolcanoViewSet(ModelViewSet):
     search_fields = ['shortnamevol', 
                   'longnamevol', 
                   'descriptionvol', 
-                  'altitudevol', 'pwavespeedvol', 'densityvol', 'attcorrectfactorvol']
+                  'altitudevol', 
+                  'pwavespeedvol', 
+                  'densityvol', 
+                  'attcorrectfactorvol']
 
 
     def all(self, request):
