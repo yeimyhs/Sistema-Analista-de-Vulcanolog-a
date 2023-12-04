@@ -179,7 +179,7 @@ class VolcanoSerializer(ModelSerializer):
 
  
 class AlertSerializer(ModelSerializer):
-    idvolcano = VolcanoSerializer()
+    idvolcano = VolcanoSerializer(read_only=True)
     class Meta:
         model = Alert
         fields = '__all__'
