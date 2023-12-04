@@ -170,9 +170,16 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user, user_profile
        
  
+class VolcanoSerializer(ModelSerializer):
+
+    class Meta:
+        model = Volcano
+        fields = '__all__'
+
+
  
 class AlertSerializer(ModelSerializer):
-
+    idvolcano = VolcanoSerializer()
     class Meta:
         model = Alert
         fields = '__all__'
@@ -314,14 +321,6 @@ class TemporaryseriesSerializer(ModelSerializer):
     class Meta:
         model = Temporaryseries
         fields = '__all__'
-
-
-class VolcanoSerializer(ModelSerializer):
-
-    class Meta:
-        model = Volcano
-        fields = '__all__'
-
 
 class MappingSerializer(ModelSerializer):
 
