@@ -53,6 +53,7 @@ urlpatterns = [
    
    #path("password_change", views.password_change, name="password_change"),
    path("maskimgrawpertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.MaskImgRawPerTime.as_view(), name="MaskImgRawPerTime"),
+   path("blobsstationpermask/<str:idmask>", views.BlobsStationperMask.as_view(), name="BlobsStationperMask"),
    path("tempseriespertime/<str:idstation>/<str:value>/<str:starttime>/<str:finishtime>", views.TempSeriesPerTime.as_view(), name="TempSeriesPerTime"),
    path("tempseriespertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.TempSeriesPerTime.as_view(), name="TempSeriesPerTime"),
    ##path("meteorologicaldatapertime/<str:idstation>/<str:value>/<str:starttime>/<str:finishtime>", views.MeteorologicalDataPertTime.as_view(), name="MeteorologicalDataPertTime"),

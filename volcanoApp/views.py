@@ -184,27 +184,20 @@ class TempSeriesPerTime(generics.GenericAPIView):
         except Exception as e:
             return Response({'error': str(e)})
 #----------------------------------------------------------------------MaskImgRawPerTime
-'''class BlobsStationperMask(generics.GenericAPIView):
+class BlobsStationperMask(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
 
     def get(self, request, idmask):
-        try:
-            blobs = Blob.objects.filter(statemask=1).filter(
-                Q(idmask__idstation=idstation),
-                starttimemask__gte=starttime,
-                starttimemask__lte=finishtime           
-            )
+      
+            mask= Mask.objects.get(idmask = idmask)
+            blobs = Blob.objects.filter(stateblob=1).filter(idmask=idmask)
             results = []
-            for mask in masks_within_interval:
-                segmentation_image = Imagesegmentation.objects.filter(stateimg=1).get(idphoto=mask.idmask.idphoto)
-                results.append({
-                    'mask': MaskSerializer(mask).data,
-                    'segmentation_image': ImagesegmentationSerializer(segmentation_image).data
-                })
+            results.append({
+                'Station': StationSerializer(mask.idstation).data,
+                'Blobs': BlobSerializer(blobs, many=True).data,
+            })
             return Response({'results': results})
-        except Exception as e:
-            return Response({'error': str(e)})'
-			'''
+     
 #----------------------------------------------------------------------MaskImgRawPerTime
 
 class MaskImgRawPerTime(generics.GenericAPIView):
