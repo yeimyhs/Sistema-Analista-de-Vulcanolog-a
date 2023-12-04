@@ -338,7 +338,14 @@ class mailer(APIView):
 class AlertViewSet(ModelViewSet):
     queryset = Alert.objects.filter(statealert=1).order_by('pk')
     serializer_class = AlertSerializer
-    filterset_class = volcanoApp.filters.AlertFilter 
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
+    filterset_class = volcanoApp.filters.AlertFilter
+    search_fields = ['idalert',
+                  'idvolcano__longnamevol',
+                  'idvolcano__shortnamevol', 
+                  'idvolcano__descriptionvol' ,
+                     'messagealert'
+                  ] 
 
 '''    pagination_class = CustomPagination 
 
@@ -352,7 +359,7 @@ class AlertconfigurationViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     filterset_class = volcanoApp.filters.AlertConfFilter 
     search_fields = ['idalertconf', 
-                  'idvolcano__longnamevol', 
+                  'idvolcano__longnamevol',
                   'notificationalertconf', 
                   'messagetemplateconfalert',]
 
