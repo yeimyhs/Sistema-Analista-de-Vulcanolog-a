@@ -409,7 +409,15 @@ class StationViewSet(ModelViewSet):
     serializer_class = StationSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     filterset_class = volcanoApp.filters.StationFilter 
-
+    search_fields = ['idstation',
+                     'standardnamestat',
+                     'shortnamestat',
+                     'longnamestat',
+                     'latitudestat',
+                     'longitudestat',
+                     'altitudestat',
+                     'idvolcano__longnamevol',
+                     'typestat']
     def all(self, request):
         queryset = Station.objects.filter(statestat=1)
         data = StationSerializer(queryset, many=True).data
