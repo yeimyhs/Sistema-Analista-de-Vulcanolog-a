@@ -178,12 +178,20 @@ class VolcanoSerializer(ModelSerializer):
 
 
  
-class AlertSerializer(ModelSerializer):
-    idvolcano = VolcanoSerializer(read_only=True)
+class AlertSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alert
         fields = '__all__'
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        if self.context['request'].method in ['GET', 'LIST']:
+            # Obtener los detalles de Volcano y añadirlos a la representación
+            volcano_details = instance.idvolcano
+            representation['volcano_details'] = VolcanoSerializer(volcano_details).data
+
+        return representation
 
 class AlertconfigurationSerializer(ModelSerializer):
 
