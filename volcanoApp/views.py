@@ -362,7 +362,7 @@ class AlertconfigurationViewSet(ModelViewSet):
     
     def all(self, request):
         queryset = Alertconfiguration.objects.all()
-        data = AlertconfigurationSerializer(queryset, many=True).data
+        data = AlertconfigurationSerializer(queryset, many=True, context={'request': self.request}).data
         return Response(data)
 
 class BlobViewSet(ModelViewSet):
