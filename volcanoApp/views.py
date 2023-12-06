@@ -354,7 +354,10 @@ class AlertconfigurationViewSet(ModelViewSet):
     search_fields = ['idalertconf', 
                   'idvolcano__longnamevol',
                   'notificationalertconf', 
-                  'messagetemplateconfalert',]
+                  'messagetemplateconfalert',
+                  'idvolcano__longnamevol',
+                  'idvolcano__shortnamevol', 
+                  'idvolcano__descriptionvol']
 
     
     def all(self, request):
