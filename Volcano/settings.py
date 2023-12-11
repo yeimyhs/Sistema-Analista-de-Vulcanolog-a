@@ -50,7 +50,9 @@ INSTALLED_APPS = [
     'django_filters',
     'crispy_forms',
     'channels',
+    
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -63,7 +65,29 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
 ]
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
 
+CHANNEL_LAYERS = {
+    'default': {
+        ### Method 1: Via redis lab
+        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        # 'CONFIG': {
+        #     "hosts": [
+        #       'redis://h:<password>;@<redis Endpoint>:<port>' 
+        #     ],
+        # },
+
+        ### Method 2: Via local Redis
+        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        # 'CONFIG': {
+        #      "hosts": [('127.0.0.1', 6379)],
+        # },
+
+        ### Method 3: Via In-memory channel layer
+        ## Using this method.
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    },
+}
 
 ROOT_URLCONF = 'Volcano.urls'
 
@@ -84,7 +108,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'Volcano.wsgi.application'
-
+ASGI_APPLICATION = 'Volcano.asgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -153,6 +177,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://134.122.125.35",
     "http://localhost:3000",
     "http://localhost:8001",
+    "http://localhost:8004",
     "http://127.0.0.1:9000",
 ]
 
@@ -160,6 +185,7 @@ CORS_ORIGIN_WHITELIST = [
     "https://134.122.125.35",
     "http://localhost:3000",
     "http://localhost:8001",
+    "http://localhost:8004",
     "http://127.0.0.1:9000",
 ]
 CORS_ORIGIN_ALLOW_ALL = True

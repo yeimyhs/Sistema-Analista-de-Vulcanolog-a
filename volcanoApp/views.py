@@ -494,3 +494,8 @@ class VolcanoViewSet(ModelViewSet):
         queryset = Volcano.objects.filter(statevol=1)
         data = VolcanoSerializer(queryset, many=True).data
         return Response(data)
+    
+from django.shortcuts import render
+
+def index(request):
+    return render(request, 'websocket/index.html')

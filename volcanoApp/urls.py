@@ -51,6 +51,7 @@ urlpatterns = [
     path('logoutall/', knox_views.LogoutAllView.as_view(), name='logoutall'),#cuando inicia sesion en varios browser y quiere salir de todos
     path('userbyToken/', views.UserAPI.as_view()),
    
+   path('', views.index, name='index'),
    #path("password_change", views.password_change, name="password_change"),
    path("maskimgrawpertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.MaskImgRawPerTime.as_view(), name="MaskImgRawPerTime"),
    path("blobsstationpermask/<str:idmask>", views.BlobsStationperMask.as_view(), name="BlobsStationperMask"),

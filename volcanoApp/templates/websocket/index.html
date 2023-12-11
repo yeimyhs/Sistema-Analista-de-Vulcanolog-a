@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Example</title>
+    <!-- Aquí van tus enlaces a CSS, si es necesario -->
+</head>
+<body>
+
+<!-- Tu contenido HTML -->
+
+<script>
+const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
+chatSocket.onopen = function(e) {
+    console.log('CONNETC');
+};
+chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    const message = data['message'];
+    // Handle incoming message
+};
+
+chatSocket.onclose = function(e) {
+    console.error('Chat socket closed unexpectedly');
+};
+
+// Send message to server
+function sendMessage(message) {
+    chatSocket.send(JSON.stringify({
+        'message': message
+    }));
+}
+</script>
+
+<!-- Aquí van tus scripts adicionales, si es necesario -->
+</body>
+</html>
