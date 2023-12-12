@@ -496,6 +496,64 @@ class VolcanoViewSet(ModelViewSet):
         return Response(data)
     
 from django.shortcuts import render
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
 
+class ContarRegistrosAPIView(APIView):
+    def get(self, request, *args, **kwargs):
+        # Realizar el conteo de registros en diferentes modelos
+        cantidad_registrosUserp = UserP.objects.count()
+        cantidad_registrosVolcanes = Volcano.objects.count()
+        cantidad_registrosEstaciones = Station.objects.count()
+        cantidad_registrosAlert = Alert.objects.count()
+        ultimos3_alert = Alert.objects.all().order_by('-datecreationalert')[:3]
+        ultimos3_alert_serialized = AlertSerializer(ultimos3_alert, many=True, context={'request': request}).data
+        # Obtener el conteo de alertas por volcán y usuarios por país
+        conteo_alertas_por_volcan = list(Alert.objects.values('idvolcano__shortnamevol').annotate(total_alertas=Count('idvolcano')))
+        usuarios_por_pais = list(UserP.objects.values('country').annotate(total_usuarios=Count('country')))
+        
+
+      
+        caracterizaciones= Mask.objects.count()
+        Series_Temporales= Temporaryseries.objects.count()
+        Wind_direction= Winddirection.objects.count()
+        Ashfall_prediction = Ashfallprediction.objects.count()
+
+        alertas_por_mes = Alert.objects.annotate(
+            mes=TruncMonth('datecreationalert')
+        ).values('mes').annotate(
+            total_alertas_mes=Count('idalert')
+        ).order_by('mes')
+        # Formatear los resultados
+        alerta_por_mes = [
+            {
+                'mes': alerta['mes'].strftime('%Y-%m'),
+                'total_alertas_mes': alerta['total_alertas_mes']
+            }
+            for alerta in alertas_por_mes
+        ]
+        
+
+        # Devolver el conteo como JSON
+        return Response({
+            'cantidad_registrosUserp': cantidad_registrosUserp,
+            'cantidad_registrosVolcanes': cantidad_registrosVolcanes,
+            'cantidad_registrosEstaciones': cantidad_registrosEstaciones,
+            'cantidad_registrosAlert': cantidad_registrosAlert,
+            'ultimos3_alert': ultimos3_alert_serialized,
+            'alerts_por_volcan': conteo_alertas_por_volcan,
+            'usuarios_por_pais': usuarios_por_pais,
+            'caracterizaciones': caracterizaciones,
+            'Series_Temporales' : Series_Temporales, 
+            'Wind_direction' :Wind_direction , 
+            'Ashfall_prediction' : Ashfall_prediction, 
+            'alerta_por_mes' :alerta_por_mes 
+
+
+        }, status=status.HTTP_200_OK)
+    
 def index(request):
     return render(request, 'websocket/index.html')
+
+def pushnotif(request):
+    return render(request, 'websocket/pushnotif.html')
