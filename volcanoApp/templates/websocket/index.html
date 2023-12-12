@@ -9,7 +9,7 @@
 <!-- Tu contenido HTML -->
 
 <script>
-const chatSocket = new WebSocket('ws://' + window.location.host + '/ws/chat/');
+const chatSocket = new WebSocket('ws://' + window.location.host + ':8003/ws/chat/');
 chatSocket.onopen = function(e) {
     console.log('CONNETC');
 };
@@ -20,7 +20,7 @@ chatSocket.onmessage = function(e) {
 };
 
 chatSocket.onclose = function(e) {
-    console.error('Chat socket closed unexpectedly');
+    console.error(e);
 };
 
 // Send message to server
