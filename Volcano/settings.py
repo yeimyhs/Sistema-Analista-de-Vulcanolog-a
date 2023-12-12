@@ -34,6 +34,7 @@ DOMAIN = '134.122.125.35'
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,7 +50,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'django_filters',
     'crispy_forms',
-    'channels',
     
 ]
 
@@ -78,14 +78,14 @@ CHANNEL_LAYERS = {
         # },
 
         ### Method 2: Via local Redis
-        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        # 'CONFIG': {
-        #      "hosts": [('127.0.0.1', 6379)],
-        # },
+         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+         'CONFIG': {
+              "hosts": [('127.0.0.1', 6379)],
+         },
 
         ### Method 3: Via In-memory channel layer
         ## Using this method.
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
+        #"BACKEND": "channels.layers.InMemoryChannelLayer"
     },
 }
 
