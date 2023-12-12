@@ -11,8 +11,8 @@ from django.utils import timezone
 
 class Alert(models.Model):
     messagealert = models.TextField(db_column='messageAlert', blank = True)  # Field name made lowercase.
-    idalert = models.BigAutoField(db_column='idAlert', primary_key=True)  # Field name made lowercase.
-    datecreationalert = models.TimeField(db_column='dateCreationAlert',auto_now_add=True)  # Field name made lowercase.
+    idalert = models.CharField(max_length=24,db_column='idAlert', primary_key=True, blank= True) # Field name made lowercase.
+    datecreationalert = models.DateTimeField(db_column='dateCreationAlert',auto_now_add=True)  # Field name made lowercase.
     statealert = models.IntegerField(db_column='stateAlert')  # Field name made lowercase.
     idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano')  # Field name made lowercase.
     idalertconf = models.ForeignKey('Alertconfiguration', models.DO_NOTHING, db_column='idAlertConf')  # Field name made lowercase.
@@ -36,7 +36,7 @@ class Alertconfiguration(models.Model):
     idalertconf = models.CharField(max_length=24,db_column='idAlertConf', primary_key=True, blank= True)  # Field name made lowercase.
     altitudalertconf = models.FloatField(db_column='altitudAlertConf')  # Field name made lowercase.
     statealertconf = models.IntegerField(db_column='stateAlertConf')  # Field name made lowercase.
-    datecreationalertconf = models.TimeField(db_column='dateCreationAlertConf',auto_now_add=True)  # Field name made lowercase.
+    datecreationalertconf = models.DateTimeField(db_column='dateCreationAlertConf',auto_now_add=True)  # Field name made lowercase.
     idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano', blank=True, null=True)  # Field name made lowercase.
     notificationalertconf = models.BigIntegerField(db_column='notificationAlertConf', blank=True, null=True)  # Field name made lowercase.
     messagetemplateconfalert = models.TextField(db_column='messageTemplateConfAlert', blank=True, null=True)  # Field name made lowercase.
