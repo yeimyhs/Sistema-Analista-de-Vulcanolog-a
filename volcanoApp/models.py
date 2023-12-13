@@ -17,6 +17,10 @@ class Alert(models.Model):
     idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano')  # Field name made lowercase.
     idalertconf = models.ForeignKey('Alertconfiguration', models.DO_NOTHING, db_column='idAlertConf')  # Field name made lowercase.
     startalert = models.SmallIntegerField(db_column='startAlert', blank=True, null=True)  # Field name made lowercase.
+    
+    heighalert = models.FloatField(db_column='heighAlert')  # copiar de mask
+    idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
+    alertlevelalert  =models.CharField(max_length=10,db_column='alertLevelAlert')#copiar de volcan
 
     class Meta:
         db_table = 'Alert'
@@ -353,6 +357,11 @@ class UserP(models.Model):
         return self.email
     
 class Volcano(models.Model):
+    OPCIONES = [
+        ('Medio', ''),
+        ('Bajo', ''),
+        ('Alto', ''),
+    ]
     shortnamevol = models.CharField(db_column='shortNameVol', max_length=20)  # Field name made lowercase.
     longnamevol = models.CharField(db_column='longNameVol', max_length=126)  # Field name made lowercase.
     idvolcano = models.CharField(db_column='idVolcano', max_length=9, primary_key=True,
@@ -368,6 +377,7 @@ class Volcano(models.Model):
     indvol = models.IntegerField(db_column='indVol')  # Field name made lowercase.
     statevol = models.SmallIntegerField(db_column='stateVol')  # Field name made lowercase.
     datecreationvol = models.DateTimeField(auto_now_add=True,db_column='DateCreationVol')  # Field name made lowercase.
+    alertlevelvol  =models.CharField(max_length=10, choices=OPCIONES,db_column='alertLevelVol')
 
     class Meta:
         db_table = 'Volcano'

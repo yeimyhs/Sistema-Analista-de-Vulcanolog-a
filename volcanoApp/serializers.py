@@ -289,13 +289,17 @@ class MaskSerializer(ModelSerializer):
         alertconf = Alertconfiguration.objects.filter(idvolcano=idvolcanoimg).first()
         #print("------------------",alertconf)
         if alertconf is not None:
-            if self.instance.startalert == 1:
+            if alertconf.startalert == 1:
                 if self.instance.heighmask > alertconf.altitudalertconf:
                     nueva_alerta = Alert(
                         messagealert=alertconf.messagetemplateconfalert,  # Reemplaza con el mensaje real
                         statealert=1,  # Reemplaza con el estado real
                         idvolcano=idvolcanoimg,  # Reemplaza con el ID del volcán asociado
                         idalertconf= alertconf,  # Reemplaza con el ID de la configuración de alerta asociada
+                        heighalert= self.instance.heighmask,
+                        idstation= self.instance.idstation,
+                        alertlevelalert = volcano_obj.alertlevelvol
+
                     )
                     message = alertconf.messagetemplateconfalert
                     if self.instance.mensajeriaalertconf == 1:
