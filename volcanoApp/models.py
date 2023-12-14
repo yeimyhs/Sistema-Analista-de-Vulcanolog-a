@@ -174,7 +174,7 @@ class Winddirection(models.Model):
     #idwtation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
     #idtemporarwseries = models.ForeignKey('Temporaryseries', models.DO_NOTHING, db_column='idTemporarySeries', blank=True, null=True)  # Field name made lowercase.                                                        5                                                                                                                                                                                                                                              w       = models.ForeignKey('Temporaryseries', models.DO_NOTHING, db_column='idTemporarySeries', blank=True, null=True)  # Field name made lowercase.
     statewinddir = models.SmallIntegerField(db_column='stateWinddir',default= 1)  # Field name made lowercase.
-    idwinddirection = models.CharField(max_length=21,db_column='idWinddirereorologicalData', primary_key=True)  # Field name made lowercase.
+    idwinddirection = models.CharField(max_length=21,db_column='idWinddir', primary_key=True)  # Field name made lowercase.
 
     class Meta:
         db_table = 'WindDirection'
