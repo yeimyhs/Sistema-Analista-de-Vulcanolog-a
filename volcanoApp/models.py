@@ -15,7 +15,7 @@ class Alert(models.Model):
     datecreationalert = models.DateTimeField(db_column='dateCreationAlert',auto_now_add=True)  # Field name made lowercase.
     statealert = models.IntegerField(db_column='stateAlert')  # Field name made lowercase.
     idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano')  # Field name made lowercase.
-    idalertconf = models.ForeignKey('Alertconfiguration', models.DO_NOTHING, db_column='idAlertConf')  # Field name made lowercase.
+    idalertconf = models.ForeignKey('Alertconfiguration', on_delete=models.CASCADE, db_column='idAlertConf')  # Field name made lowercase.
     startalert = models.SmallIntegerField(db_column='startAlert', blank=True, null=True)  # Field name made lowercase.
     
     heighalert = models.FloatField(db_column='heighAlert')  # copiar de mask
@@ -62,7 +62,7 @@ class Alertconfiguration(models.Model):
 
 class Blob(models.Model):#SABCAJA2023082202000000
     idblob = models.CharField(max_length=24,db_column='idBlob', primary_key=True, blank=True ) # Field name made lowercase.
-    idmask = models.ForeignKey('Mask', models.DO_NOTHING, db_column='idMask')  # Field name made lowercase.
+    idmask = models.ForeignKey('Mask', on_delete=models.CASCADE, db_column='idMask')  # Field name made lowercase.
     indblob = models.CharField(max_length=1,db_column='indblob')  # Field name made lowercase.
     perimetertblob = models.FloatField(db_column='perimeterblob')  # Field name made lowercase.
     xcentroidtblob = models.FloatField(db_column='xCentroidblob')  # Field name made lowercase.
@@ -112,7 +112,7 @@ class History(models.Model):
     statepermissionchangehistory = models.IntegerField(db_column='statePermissionChangeHistory')  # Field name made lowercase.
     datepermissionchangehistory = models.TimeField(db_column='datePermissionChangeHistory')  # Field name made lowercase.
     idtabletochangehistory = models.BigIntegerField(db_column='idTableToChangeHistory')  # Field name made lowercase.
-    iduser = models.ForeignKey(User, models.DO_NOTHING, db_column='idUser')  # Field name made lowercase.
+    iduser = models.ForeignKey(User, on_delete=models.CASCADE, db_column='idUser')  # Field name made lowercase.
     idregisterhistory = models.BigIntegerField(db_column='idRegisterHistory')  # Field name made lowercase.
     statehistory = models.SmallIntegerField(db_column='stateHistory')  # Field name made lowercase.
 
@@ -272,7 +272,7 @@ class Station(models.Model):
 class Temporaryseries(models.Model): #SABSABA20230820202649
     idtemporaryseries = models.CharField(max_length=21,db_column='idTemporarySeries', primary_key=True, blank=True)  # Field name made lowercase.
     #idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano')  # Field name made lowercase.
-    idstation = models.ForeignKey(Station, models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
+    idstation = models.ForeignKey(Station, on_delete=models.CASCADE, db_column='idStation')  # Field name made lowercase.
     ideventtype = models.ForeignKey(Eventtype, models.CASCADE, db_column='idEventType',default="00")  # No se identifica Field name made lowercase.
     meantempser = models.FloatField(db_column='meanTempSer')  # Field name made lowercase.
     variancetempser = models.FloatField(db_column='varianceTempSer')  # Field name made lowercase.
