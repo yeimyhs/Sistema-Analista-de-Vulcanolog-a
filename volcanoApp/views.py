@@ -557,3 +557,25 @@ def index(request):
 
 def pushnotif(request):
     return render(request, 'websocket/pushnotif.html')
+
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+def listar_grupos_y_mensajes(request):
+    channel_layer = get_channel_layer()
+
+    # Obtener todas las keys (claves) de los canales en Redis
+    all_channel_keys = async_to_sync(channel_layer.keys)('*')
+
+    # Filtrar solo las keys que son de tipo grupo (canales de grupos)
+    group_channel_keys = [key.decode('utf-8') for key in all_channel_keys if key.startswith("group")]
+
+    # Imprimir los nombres de los grupos encontrados
+    print("Grupos existentes:")
+    for group_key in group_channel_keys:
+        print(group_key)
+
+    # Verificar mensajes pendientes en cada grupo
+    for group_key in group_channel_keys:
+        messages = async_to_sync(channel_layer.llen)(group_key)
+        print(f"Grupo: {group_key}, Mensajes pendientes: {messages}")

@@ -4,11 +4,19 @@
 <head>
     <title>WebSocket Test</title>
     <script>
-        const socket = new WebSocket('ws://' + window.location.host + '/ws/notificaciones/SAB/'); // Reemplaza con tu URL WebSocket
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/notificaciones/volcan_SABANCAYA/'); // Reemplaza con tu URL WebSocket
+        //const socket = new WebSocket('ws://' + window.location.host + '/ws/realtime/SAB/');
         socket.onmessage = function(event) {
             const mensaje = JSON.parse(event.data);
             // Maneja el mensaje recibido
             console.log('Mensaje recibido:', mensaje);
+        };
+        socket.onopen = function(e) {
+            console.log('CONNETC');
+        };
+
+        socket.onclose = function(e) {
+            console.error(e);
         };
     </script>
 </head>

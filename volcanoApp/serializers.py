@@ -298,11 +298,11 @@ class MaskSerializer(ModelSerializer):
                         idalertconf= alertconf,  # Reemplaza con el ID de la configuración de alerta asociada
                         heighalert= self.instance.heighmask,
                         idstation= self.instance.idstation,
-                        alertlevelalert = volcano_obj.alertlevelvol
+                        alertlevelalert = self.instance.idmask.idstation.idvolcano.alertlevelvol
 
                     )
                     message = alertconf.messagetemplateconfalert
-                    if self.instance.mensajeriaalertconf == 1:
+                    if alertconf.mensajeriaalertconf == 1:
                         url = f"https://api.telegram.org/bot{settings.TELEGRAM_TOKEN}/sendMessage?chat_id={settings.TELEGRAM_CHANNEL_CHAT_ID}&text={message}"
                         phone_numbers = list(UserP.objects.values_list('phone', flat=True))
 
