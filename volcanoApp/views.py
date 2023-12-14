@@ -104,17 +104,17 @@ def password_reset_request(request):
     return JsonResponse({"error": "Solicitud inválida"})
 #----------------------------------------------------------------------MaskImgRawPerTime
 
-'''class MeteorologicalDataPertTime(generics.GenericAPIView):
+class MeteorologicalDataPertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
 
-    def get(self, request, idstation, starttime, finishtime,value= "vmet"):
+    def get(self, request, idstation, starttime, finishtime,value= "vwinddir"):
         try:
             idstation = idstation
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
-            MDs_within_interval = Meteorologicaldata.objects.filter(statemet=1).filter(
+            MDs_within_interval = Winddirection.objects.filter(
                 Q(idstation=idstation),
                 starttimemet__gte=starttime,
                 starttimemet__lte=finishtime
@@ -125,11 +125,11 @@ def password_reset_request(request):
             return Response({'results': response_data})
         except Exception as e:
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
-'''
+
 from rest_framework.pagination import PageNumberPagination
 
 class TempSeriesPagination(PageNumberPagination):
-    page_size = 10
+    page_size = 0
     page_size_query_param = 'page_size'
     max_page_size = 1000
 
@@ -156,7 +156,7 @@ class TempSeriesPerTime(generics.GenericAPIView):
 
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
-            '''TSs_within_interval = Temporaryseries.objects.filter(statetempser=1).filter(
+            '''TSs_within_interval = Temporaryseries.objects.filter(
                 Q(idstation=idstation),
                 starttimetempser__gte=starttime,
                 starttimetempser__lte=finishtime
@@ -190,7 +190,7 @@ class BlobsStationperMask(generics.GenericAPIView):
     def get(self, request, idmask):
       
             mask= Mask.objects.get(idmask = idmask)
-            blobs = Blob.objects.filter(stateblob=1).filter(idmask=idmask)
+            blobs = Blob.objects.filter(idmask=idmask)
             results = []
             results.append({
                 'Station': StationSerializer(mask.idstation).data,
@@ -210,14 +210,14 @@ class MaskImgRawPerTime(generics.GenericAPIView):
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
-            masks_within_interval = Mask.objects.filter(statemask=1).filter(
+            masks_within_interval = Mask.objects.filter(
                 Q(idmask__idstation=idstation),
                 starttimemask__gte=starttime,
                 starttimemask__lte=finishtime
             )
             results = []
             for mask in masks_within_interval:
-                segmentation_image = Imagesegmentation.objects.filter(stateimg=1).get(idphoto=mask.idmask.idphoto)
+                segmentation_image = Imagesegmentation.objects.get(idphoto=mask.idmask.idphoto)
                 results.append({
                     'mask': MaskSerializer(mask).data,
                     'segmentation_image': ImagesegmentationSerializer(segmentation_image).data
@@ -329,7 +329,7 @@ class mailer(APIView):
  #----------------------------------------------------------------------
 
 class AlertViewSet(ModelViewSet):
-    queryset = Alert.objects.filter(statealert=1).order_by('pk')
+    queryset = Alert.objects.order_by('pk')
     serializer_class = AlertSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     filterset_class = volcanoApp.filters.AlertFilter
@@ -347,7 +347,7 @@ class AlertViewSet(ModelViewSet):
 '''
 
 class AlertconfigurationViewSet(ModelViewSet):
-    queryset = Alertconfiguration.objects.filter(statealertconf=1).order_by('pk')
+    queryset = Alertconfiguration.objects.order_by('pk')
     serializer_class = AlertconfigurationSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     filterset_class = volcanoApp.filters.AlertConfFilter 
@@ -366,49 +366,49 @@ class AlertconfigurationViewSet(ModelViewSet):
         return Response(data)
 
 class BlobViewSet(ModelViewSet):
-    queryset = Blob.objects.filter(stateblob=1).order_by('pk')
+    queryset = Blob.objects.order_by('pk')
     serializer_class = BlobSerializer
 
 
 class EventtypeViewSet(ModelViewSet):
-    queryset = Eventtype.objects.filter(stateevent=1).order_by('pk')
+    queryset = Eventtype.objects.order_by('pk')
     serializer_class = EventtypeSerializer
 
 
 class HistoryViewSet(ModelViewSet):
-    queryset = History.objects.filter(statehistory=1).order_by('pk')
+    queryset = History.objects.order_by('pk')
     serializer_class = HistorySerializer
 
 
 class ImagesegmentationViewSet(ModelViewSet):
-    queryset = Imagesegmentation.objects.filter(stateimg=1).order_by('pk')
+    queryset = Imagesegmentation.objects.order_by('pk')
     serializer_class = ImagesegmentationSerializer
 
 
 class MaskViewSet(ModelViewSet):
-    queryset = Mask.objects.filter(statemask=1).order_by('pk')
+    queryset = Mask.objects.order_by('pk')
     serializer_class = MaskSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     #pagination_class = None
 
 class AshdispersionViewSet(ModelViewSet):
-    queryset = Ashdispersion.objects.filter(stateashdisp=1).order_by('pk')
+    queryset = Ashdispersion.objects.order_by('pk')
     serializer_class = AshdispersionSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
 
 class AshfallpredictionViewSet(ModelViewSet):
-    queryset = Ashfallprediction.objects.filter(stateashfall=1).order_by('pk')
+    queryset = Ashfallprediction.objects.order_by('pk')
     serializer_class = AshfallpredictionSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
 
 class WinddirectionViewSet(ModelViewSet):
-    queryset = Winddirection.objects.filter(statewinddir=1).order_by('pk')
+    queryset = Winddirection.objects.order_by('pk')
     serializer_class = WinddirectionSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
 
 
 class StationViewSet(ModelViewSet):
-    queryset = Station.objects.filter(statestat=1).order_by('pk')
+    queryset = Station.objects.order_by('pk')
     serializer_class = StationSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     filterset_class = volcanoApp.filters.StationFilter 
@@ -422,12 +422,12 @@ class StationViewSet(ModelViewSet):
                      'idvolcano__longnamevol',
                      'typestat']
     def all(self, request):
-        queryset = Station.objects.filter(statestat=1)
+        queryset = Station.objects.all()
         data = StationSerializer(queryset, many=True).data
         return Response(data)
     
 class TemporaryseriesViewSet(ModelViewSet):
-    queryset = Temporaryseries.objects.filter(statetempser=1).order_by('pk')
+    queryset = Temporaryseries.objects.order_by('pk')
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     serializer_class = TemporaryseriesSerializer
 class MappingViewSet(ModelViewSet):
@@ -436,14 +436,14 @@ class MappingViewSet(ModelViewSet):
 
 
 class UserPViewSet(ModelViewSet):
-    queryset = UserP.objects.filter(state=1).order_by('pk')
+    queryset = UserP.objects.order_by('pk')
     serializer_class = UserPSerializer
     pagination_class = PageNumberPagination
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     filterset_class = volcanoApp.filters.UserPFilter 
 
     def all(self, request):
-        queryset = UserP.objects.filter(state=1)
+        queryset = UserP.objects.all()
         data = UserPSerializer(queryset, many=True).data
         return Response(data)
 
@@ -477,7 +477,7 @@ class UserPViewSet(ModelViewSet):
                         status=status.HTTP_403_FORBIDDEN)
 
 class VolcanoViewSet(ModelViewSet):
-    queryset = Volcano.objects.filter(statevol=1).order_by('pk')
+    queryset = Volcano.objects.order_by('pk')
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     serializer_class = VolcanoSerializer
     filterset_class = volcanoApp.filters.VolcanoFilter    
@@ -491,7 +491,7 @@ class VolcanoViewSet(ModelViewSet):
 
 
     def all(self, request):
-        queryset = Volcano.objects.filter(statevol=1)
+        queryset = Volcano.objects.all()
         data = VolcanoSerializer(queryset, many=True).data
         return Response(data)
     
