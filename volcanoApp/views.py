@@ -126,6 +126,28 @@ class MeteorologicalDataPertTime(generics.GenericAPIView):
         except Exception as e:
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
 
+class TempSeriesPerTime(generics.GenericAPIView):
+    queryset = []  # Define una consulta ficticia
+
+    def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
+        try:
+            idstation = idstation
+            starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
+            finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
+            #lapsemin = int(lapsemin)
+            #starttime = starttime - timedelta(hours=6)
+            TSs_within_interval = Temporaryseries.objects.filter(statetempser=1).filter(
+                Q(idstation=idstation),
+                starttimetempser__gte=starttime,
+                starttimetempser__lte=finishtime
+            )
+            serializer = TemporaryseriesSerializer(TSs_within_interval, many=True)
+            response_data = [{'starttimetempser': item['starttimetempser'], 'value': item[value], 'type' : item['ideventtype']} for item in serializer.data]
+
+            return Response({'results': response_data})
+        except Exception as e:
+            return Response({'error': str(e)})
+        
 from rest_framework.pagination import PageNumberPagination
 
 class TempSeriesPagination(PageNumberPagination):
@@ -137,7 +159,7 @@ from obspy.clients.earthworm import Client
 from obspy import UTCDateTime
 import time
 
-class TempSeriesPerTime(generics.GenericAPIView):
+class TempSeriesOBSPerTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
     pagination_class = TempSeriesPagination
     def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
