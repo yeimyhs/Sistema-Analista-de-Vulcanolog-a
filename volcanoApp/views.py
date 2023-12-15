@@ -143,7 +143,7 @@ class WinddirectionCompletePertTime(generics.GenericAPIView):
             
             paginated_queryset = self.paginate_queryset(WDs_within_interval)
             
-            serializer = TemporaryseriesSerializer(paginated_queryset, many=True)
+            serializer = WinddirectionSerializer(paginated_queryset, many=True)
             
             return self.get_paginated_response(serializer.data) 
         except Exception as e:
@@ -163,7 +163,7 @@ class AshfallpredictionPertTime(generics.GenericAPIView):
                 starttimeashfall__gte=starttime,
                 starttimeashfall__lte=finishtime
             )
-            serializer = WinddirectionSerializer(WDs_within_interval, many=True)
+            serializer = AshfallpredictionSerializer(WDs_within_interval, many=True)
             response_data = [{'starttime': item['starttimeashfall'], 'value': item[value]} for item in serializer.data]
 
             return Response({'results': response_data})
@@ -209,7 +209,7 @@ class AshdispersionCompletePertTime(generics.GenericAPIView):
                 starttimeashdisp__gte=starttime,
                 starttimeashdisp__lte=finishtime
             ).order_by('starttimeashdisp')
-            serializer = WinddirectionSerializer(ADs_within_interval, many=True)
+            serializer = AshdispersionSerializer(ADs_within_interval, many=True)
             response_data = [{'starttime': item['starttimeashfall'], 'value': item[value]} for item in serializer.data]
 
             return Response({'results': response_data})
