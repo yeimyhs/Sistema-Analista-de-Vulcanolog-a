@@ -129,8 +129,7 @@ class WinddirectionCompletePertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
     pagination_class = PageNumberPagination
     pagination_class.page_size = 10
-    filter_backends = [ filters.OrderingFilter]
-    ordering_fields = '__all__'
+    
     def get(self, request, idvolcano, starttime, finishtime,value= "vwinddir"):
         try:
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
@@ -150,6 +149,7 @@ class WinddirectionCompletePertTime(generics.GenericAPIView):
             return self.get_paginated_response(serializer.data) 
         except Exception as e:
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
+
 
 class AshfallpredictionPertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
@@ -198,9 +198,8 @@ class AshdispersionPertTime(generics.GenericAPIView):
 class AshdispersionCompletePertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
     pagination_class = PageNumberPagination
-    pagination_class.page_size = 10
-    filter_backends = [ filters.OrderingFilter]
-    ordering_fields = '__all__'
+    pagination_class.page_size = 1
+    
     def get(self, request, idvolcano, starttime, finishtime,value= "jsonashdisp"):
         try:
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
@@ -214,10 +213,12 @@ class AshdispersionCompletePertTime(generics.GenericAPIView):
                 starttimeashdisp__gte=starttime,
                 starttimeashdisp__lte=finishtime
             ).order_by('starttimeashdisp')
-            serializer = AshdispersionSerializer(ADs_within_interval, many=True)
-            response_data = [{'starttime': item['starttimeashdisp'], 'value': item[value]} for item in serializer.data]
+            paginated_queryset = self.paginate_queryset(ADs_within_interval)
+            
+            serializer = AshdispersionSerializer(paginated_queryset, many=True)
+            #response_data = [{'starttime': item['starttimeashdisp'], 'value': item[value]} for item in serializer.data]
 
-            return Response({'results': response_data})
+            return self.get_paginated_response(serializer.data) 
         except Exception as e:
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
 
@@ -247,8 +248,7 @@ class TempSeriesCompletePerTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
     pagination_class = PageNumberPagination
     pagination_class.page_size = 10
-    filter_backends = [ filters.OrderingFilter]
-    ordering_fields = '__all__'
+    
     def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
         try:
             idstation = idstation
