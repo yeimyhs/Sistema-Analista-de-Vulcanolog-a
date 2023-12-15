@@ -134,7 +134,7 @@ class AshfallpredictionPertTime(generics.GenericAPIView):
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
-            WDs_within_interval = Winddirection.objects.filter(
+            WDs_within_interval = Ashfallprediction.objects.filter(
                 Q(idvolcano=idvolcano),
                 starttimeashfall__gte=starttime,
                 starttimeashfall__lte=finishtime
@@ -155,7 +155,7 @@ class AshdispersionPertTime(generics.GenericAPIView):
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
-            noticeash= Alertconfiguration.objects.order_by('starttimeashdisp').first().idnoticeashdisp
+            noticeash= Ashdispersion.objects.order_by('starttimeashdisp').first().idnoticeashdisp
 
             ADs_within_interval = Ashdispersion.objects.filter(
                 Q(idvolcano=idvolcano),Q(idnoticeashdisp=noticeash),
