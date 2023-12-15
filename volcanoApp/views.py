@@ -128,19 +128,42 @@ class WinddirectionPertTime(generics.GenericAPIView):
 class AshfallpredictionPertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
 
-    def get(self, request, idvolcano, starttime, finishtime,value= "vwinddir"):
+    def get(self, request, idvolcano, starttime, finishtime,value= "jsonbodyashfall"):
         try:
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
-            APs_within_interval = Ashfallprediction.objects.filter(
+            WDs_within_interval = Winddirection.objects.filter(
                 Q(idvolcano=idvolcano),
                 starttimeashfall__gte=starttime,
                 starttimeashfall__lte=finishtime
             )
-            serializer = WinddirectionSerializer(APs_within_interval, many=True)
+            serializer = WinddirectionSerializer(WDs_within_interval, many=True)
             response_data = [{'starttime': item['starttimeashfall'], 'value': item[value]} for item in serializer.data]
+
+            return Response({'results': response_data})
+        except Exception as e:
+            return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
+
+class AshdispersionPertTime(generics.GenericAPIView):
+    queryset = []  # Define una consulta ficticia
+
+    def get(self, request, idvolcano, starttime, finishtime,value= "jsonashdisp"):
+        try:
+            starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
+            finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
+            #lapsemin = int(lapsemin)
+            #starttime = starttime - timedelta(hours=6)
+            noticeash= Alertconfiguration.objects.order_by('starttimeashdisp').first().idnoticeashdisp
+
+            ADs_within_interval = Ashdispersion.objects.filter(
+                Q(idvolcano=idvolcano),Q(idnoticeashdisp=noticeash),
+                starttimeashdisp__gte=starttime,
+                starttimeashdisp__lte=finishtime
+            ).order_by('starttimeashdisp')
+            serializer = AshdispersionSerializer(ADs_within_interval, many=True)
+            response_data = [{'starttime': item['starttimeashdisp'], 'value': item[value], 'idnoticeashdisp':item['idnoticeashdisp'], 'idtypeashdisp':item['idtypeashdisp'] } for item in serializer.data]
 
             return Response({'results': response_data})
         except Exception as e:
@@ -200,7 +223,7 @@ class TempSeriesOBSPerTime(generics.GenericAPIView):
 
             # Genera una lista de diccionarios con la información requerida
             # = [{'starttimetempser': time, 'value': value, 'type': "NOC"} for time, value in zip(times, values)]
-            response_data = [{"time": UTCDateTime(time).strftime('%Y-%m-%dT%H:%M:%S.%fZ'), "value": value, 'type': "NOC"} for time, value in zip(times, values)]
+            response_data = [{"time": UTCDateTime(time).strftime('%Y-%m-%dT%H:%M:%S.%f'), "value": value, 'type': "NOC"} for time, value in zip(times, values)]
 
             #serializer = TemporaryseriesSerializer(TSs_within_interval, many=True)
             #response_data = [{'starttimetempser': item['starttimetempser'], 'value': item[value], 'type' : item['ideventtype']} for item in serializer.data]
