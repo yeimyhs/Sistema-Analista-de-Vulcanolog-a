@@ -210,7 +210,7 @@ class AshdispersionCompletePertTime(generics.GenericAPIView):
                 starttimeashdisp__lte=finishtime
             ).order_by('starttimeashdisp')
             serializer = AshdispersionSerializer(ADs_within_interval, many=True)
-            response_data = [{'starttime': item['starttimeashfall'], 'value': item[value]} for item in serializer.data]
+            response_data = [{'starttime': item['starttimeashdisp'], 'value': item[value]} for item in serializer.data]
 
             return Response({'results': response_data})
         except Exception as e:
