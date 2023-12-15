@@ -125,6 +125,29 @@ class WinddirectionPertTime(generics.GenericAPIView):
         except Exception as e:
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
 
+class WinddirectionPertTime(generics.GenericAPIView):
+    queryset = []  # Define una consulta ficticia
+
+    def get(self, request, idvolcano, starttime, finishtime,value= "vwinddir"):
+        try:
+            starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
+            finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
+            #lapsemin = int(lapsemin)
+            #starttime = starttime - timedelta(hours=6)
+            WDs_within_interval = Winddirection.objects.filter(
+                Q(idvolcano=idvolcano),
+                starttimewinddir__gte=starttime,
+                starttimewinddir__lte=finishtime
+            )
+            
+            paginated_queryset = self.paginate_queryset(WDs_within_interval)
+            
+            serializer = TemporaryseriesSerializer(paginated_queryset, many=True)
+            
+            return self.get_paginated_response(serializer.data) 
+        except Exception as e:
+            return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
+
 class AshfallpredictionPertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
 
