@@ -193,9 +193,8 @@ class TempSeriesPerTime(generics.GenericAPIView):
 from rest_framework.pagination import PageNumberPagination      
 class TempSeriesCompletePerTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
-    #pagination_class = PageNumberPagination
-    #pagination_class.page_size = 10
-    page_size = 10 
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 10
     def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
         try:
             idstation = idstation
@@ -208,9 +207,11 @@ class TempSeriesCompletePerTime(generics.GenericAPIView):
                 starttimetempser__gte=starttime,
                 starttimetempser__lte=finishtime
             )
-            serializer = TemporaryseriesSerializer(TSs_within_interval, many=True)
-
-            return Response({'results': serializer.data})
+            paginated_queryset = self.paginate_queryset(TSs_within_interval)
+            
+            serializer = TemporaryseriesSerializer(paginated_queryset, many=True)
+            
+            return self.get_paginated_response(serializer.data) 
         except Exception as e:
             return Response({'error': str(e)})
         
