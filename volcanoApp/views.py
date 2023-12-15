@@ -127,7 +127,8 @@ class WinddirectionPertTime(generics.GenericAPIView):
 
 class WinddirectionCompletePertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
-
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 10
     def get(self, request, idvolcano, starttime, finishtime,value= "vwinddir"):
         try:
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
@@ -187,6 +188,29 @@ class AshdispersionPertTime(generics.GenericAPIView):
             ).order_by('starttimeashdisp')
             serializer = AshdispersionSerializer(ADs_within_interval, many=True)
             response_data = [{'starttime': item['starttimeashdisp'], 'value': item[value], 'idnoticeashdisp':item['idnoticeashdisp'], 'idtypeashdisp':item['idtypeashdisp'] } for item in serializer.data]
+
+            return Response({'results': response_data})
+        except Exception as e:
+            return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
+class AshdispersionCompletePertTime(generics.GenericAPIView):
+    queryset = []  # Define una consulta ficticia
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 10
+    def get(self, request, idvolcano, starttime, finishtime,value= "jsonashdisp"):
+        try:
+            starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
+            finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
+            #lapsemin = int(lapsemin)
+            #starttime = starttime - timedelta(hours=6)
+            noticeash= Ashdispersion.objects.order_by('starttimeashdisp').first().idnoticeashdisp
+
+            ADs_within_interval = Ashdispersion.objects.filter(
+                Q(idvolcano=idvolcano),Q(idnoticeashdisp=noticeash),
+                starttimeashdisp__gte=starttime,
+                starttimeashdisp__lte=finishtime
+            ).order_by('starttimeashdisp')
+            serializer = WinddirectionSerializer(ADs_within_interval, many=True)
+            response_data = [{'starttime': item['starttimeashfall'], 'value': item[value]} for item in serializer.data]
 
             return Response({'results': response_data})
         except Exception as e:
