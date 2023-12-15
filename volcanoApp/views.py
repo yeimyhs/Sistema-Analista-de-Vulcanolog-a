@@ -129,6 +129,8 @@ class WinddirectionCompletePertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
     pagination_class = PageNumberPagination
     pagination_class.page_size = 10
+    filter_backends = [ filters.OrderingFilter]
+    ordering_fields = '__all__'
     def get(self, request, idvolcano, starttime, finishtime,value= "vwinddir"):
         try:
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
@@ -163,10 +165,11 @@ class AshfallpredictionPertTime(generics.GenericAPIView):
                 starttimeashfall__gte=starttime,
                 starttimeashfall__lte=finishtime
             )
-            serializer = AshfallpredictionSerializer(WDs_within_interval, many=True)
-            response_data = [{'starttime': item['starttimeashfall'], 'value': item[value]} for item in serializer.data]
+            paginated_queryset = self.paginate_queryset(WDs_within_interval)
 
-            return Response({'results': response_data})
+            serializer = AshfallpredictionSerializer(paginated_queryset, many=True)
+            
+            return self.get_paginated_response(serializer.data) 
         except Exception as e:
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
 
@@ -196,6 +199,8 @@ class AshdispersionCompletePertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
     pagination_class = PageNumberPagination
     pagination_class.page_size = 10
+    filter_backends = [ filters.OrderingFilter]
+    ordering_fields = '__all__'
     def get(self, request, idvolcano, starttime, finishtime,value= "jsonashdisp"):
         try:
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
@@ -242,6 +247,8 @@ class TempSeriesCompletePerTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
     pagination_class = PageNumberPagination
     pagination_class.page_size = 10
+    filter_backends = [ filters.OrderingFilter]
+    ordering_fields = '__all__'
     def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
         try:
             idstation = idstation
