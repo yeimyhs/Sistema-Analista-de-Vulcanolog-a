@@ -153,7 +153,8 @@ class WinddirectionCompletePertTime(generics.GenericAPIView):
 
 class AshfallpredictionPertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
-
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 10
     def get(self, request, idvolcano, starttime, finishtime,value= "jsonbodyashfall"):
         try:
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
@@ -170,6 +171,25 @@ class AshfallpredictionPertTime(generics.GenericAPIView):
             serializer = AshfallpredictionSerializer(paginated_queryset, many=True)
             
             return self.get_paginated_response(serializer.data) 
+        except Exception as e:
+            return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
+
+class AshfallpredictionPertTime(generics.GenericAPIView):
+    queryset = []  # Define una consulta ficticia
+    def get(self, request, idvolcano, starttime, finishtime,value= "jsonbodyashfall"):
+        try:
+            starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
+            finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
+            #lapsemin = int(lapsemin)
+            #starttime = starttime - timedelta(hours=6)
+            WDs_within_interval = Ashfallprediction.objects.filter(
+                Q(idvolcano=idvolcano),
+                starttimeashfall__gte=starttime,
+                starttimeashfall__lte=finishtime
+            )
+            serializer = AshfallpredictionSerializer(WDs_within_interval, many=True)
+            response_data = [{'starttime': item['starttimeashfall'], 'value': item[value]} for item in serializer.data]
+            return Response({'results': response_data})
         except Exception as e:
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
 
