@@ -54,6 +54,7 @@ urlpatterns = [
    path('', views.index, name='index'),
    path('pushnotifchanel/', views.pushnotif, name='pushnotif'),
    path('listch/', views.listar_grupos_y_mensajes, name='listar_grupos_y_mensajes'),
+   path("chat/<str:room_name>/", views.room, name="room"),
    #path("password_change", views.password_change, name="password_change"),
    path("maskimgrawpertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.MaskImgRawPerTime.as_view(), name="MaskImgRawPerTime"),
    path("blobsstationpermask/<str:idmask>", views.BlobsStationperMask.as_view(), name="BlobsStationperMask"),

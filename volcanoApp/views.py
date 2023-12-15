@@ -104,23 +104,22 @@ def password_reset_request(request):
     return JsonResponse({"error": "Solicitud inválida"})
 #----------------------------------------------------------------------MaskImgRawPerTime
 
-class MeteorologicalDataPertTime(generics.GenericAPIView):
+class WinddirectionPertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
 
-    def get(self, request, idstation, starttime, finishtime,value= "vwinddir"):
+    def get(self, request, idvolcano, starttime, finishtime,value= "vwinddir"):
         try:
-            idstation = idstation
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
-            MDs_within_interval = Winddirection.objects.filter(
-                Q(idstation=idstation),
-                starttimemet__gte=starttime,
-                starttimemet__lte=finishtime
+            WDs_within_interval = Winddirection.objects.filter(
+                Q(idvolcano=idvolcano),
+                starttimewinddir__gte=starttime,
+                starttimewinddir__lte=finishtime
             )
-            serializer = MeteorologicaldataSerializer(MDs_within_interval, many=True)
-            response_data = [{'starttime': item['starttimemet'], 'value': item[value]} for item in serializer.data]
+            serializer = WinddirectionSerializer(WDs_within_interval, many=True)
+            response_data = [{'starttime': item['starttimewinddir'], 'value': item[value]} for item in serializer.data]
 
             return Response({'results': response_data})
         except Exception as e:
@@ -575,7 +574,22 @@ class ContarRegistrosAPIView(APIView):
         }, status=status.HTTP_200_OK)
     
 def index(request):
-    return render(request, 'websocket/index.html')
+    channel_layer = get_channel_layer()
+
+    # Definir el mensaje que deseas enviar
+    message = {
+        "type": "chat.message",  # Tipo de mensaje (puede ser cualquier identificador)
+        "text": "Hola desde la vista!",  # Contenido del mensaje
+    }
+
+    # Enviar el mensaje a través del canal "chat" a todos los clientes conectados
+    async_to_sync(channel_layer.group_send)("yei", {
+        "type": "chat.message",  # Tipo de mensaje (debe coincidir con el tipo en consumers.py)
+        "message": json.dumps(message),  # Convertir el mensaje a JSON para el envío
+    })
+    async_to_sync(channel_layer.send)('yei', {"type": "chat.message","message": "Hola a todos en esta sala!" })
+    return HttpResponse("Hola mundo")
+
 
 def pushnotif(request):
     return render(request, 'websocket/pushnotif.html')
@@ -601,3 +615,6 @@ def listar_grupos_y_mensajes(request):
     for group_key in group_channel_keys:
         messages = async_to_sync(channel_layer.llen)(group_key)
         print(f"Grupo: {group_key}, Mensajes pendientes: {messages}")
+
+def room(request, room_name):
+    return render(request, "chat/room.html", {"room_name": room_name})
