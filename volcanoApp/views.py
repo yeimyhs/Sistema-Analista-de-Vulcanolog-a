@@ -170,29 +170,18 @@ class TempSeriesPerTime(generics.GenericAPIView):
         
 from rest_framework.pagination import PageNumberPagination
 
-class TempSeriesPagination(PageNumberPagination):
-    page_size = 0
-    page_size_query_param = 'page_size'
-    max_page_size = 1000
-
 from obspy.clients.earthworm import Client
 from obspy import UTCDateTime
 import time
 
 class TempSeriesOBSPerTime(generics.GenericAPIView):
-    queryset = []  # Define una consulta ficticia
-    pagination_class = TempSeriesPagination
+    queryset = [] 
     def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
         try:
             #starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
             #finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             t1 = UTCDateTime(starttime)
-            print("-----------")
-            
             t2 = UTCDateTime(finishtime)
-        
-            print("-----------")
-            
             client = Client("10.0.20.55",16025)
             st = client.get_waveforms("PE", idstation, "", "BH?", t1, t2)
 
@@ -205,22 +194,16 @@ class TempSeriesOBSPerTime(generics.GenericAPIView):
             )'''
             
             trace = st[0]  # Suponiendo que st es la lista de traces que obtuviste de ObsPy
-            print('-',trace)
             # Accede a los valores de la serie temporal y los tiempos correspondientes
             values = trace.data
             times = trace.times()
 
             # Genera una lista de diccionarios con la información requerida
-            response_data = [{'starttimetempser': time, 'value': value, 'type': trace.stats.channel} for time, value in zip(times, values)]
-
+            # = [{'starttimetempser': time, 'value': value, 'type': "NOC"} for time, value in zip(times, values)]
+            response_data = [{"time": UTCDateTime(time).strftime('%Y-%m-%dT%H:%M:%S.%fZ'), "value": value, 'type': "NOC"} for time, value in zip(times, values)]
 
             #serializer = TemporaryseriesSerializer(TSs_within_interval, many=True)
             #response_data = [{'starttimetempser': item['starttimetempser'], 'value': item[value], 'type' : item['ideventtype']} for item in serializer.data]
-            
-            paginated_response = self.paginate_queryset(response_data)
-            if paginated_response is not None:
-                return self.get_paginated_response(paginated_response)
-            
             return Response({'results': response_data})
         
         except Exception as e:
