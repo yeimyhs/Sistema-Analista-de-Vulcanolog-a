@@ -193,7 +193,7 @@ class TempSeriesPerTime(generics.GenericAPIView):
         
 class TempSeriesCompletePerTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
-
+    page = 10
     def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
         try:
             idstation = idstation
