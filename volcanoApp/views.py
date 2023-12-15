@@ -191,6 +191,27 @@ class TempSeriesPerTime(generics.GenericAPIView):
         except Exception as e:
             return Response({'error': str(e)})
         
+class TempSeriesCompletePerTime(generics.GenericAPIView):
+    queryset = []  # Define una consulta ficticia
+
+    def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
+        try:
+            idstation = idstation
+            starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
+            finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
+            #lapsemin = int(lapsemin)
+            #starttime = starttime - timedelta(hours=6)
+            TSs_within_interval = Temporaryseries.objects.filter(statetempser=1).filter(
+                Q(idstation=idstation),
+                starttimetempser__gte=starttime,
+                starttimetempser__lte=finishtime
+            )
+            serializer = TemporaryseriesSerializer(TSs_within_interval, many=True)
+
+            return Response({'results': serializer.data})
+        except Exception as e:
+            return Response({'error': str(e)})
+        
 from rest_framework.pagination import PageNumberPagination
 
 from obspy.clients.earthworm import Client

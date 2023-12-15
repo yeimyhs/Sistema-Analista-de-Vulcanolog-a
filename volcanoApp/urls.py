@@ -63,6 +63,7 @@ urlpatterns = [
    path("maskimgrawpertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.MaskImgRawPerTime.as_view(), name="MaskImgRawPerTime"),
    path("blobsstationpermask/<str:idmask>", views.BlobsStationperMask.as_view(), name="BlobsStationperMask"),
    path("tempseriespertime/<str:idstation>/<str:value>/<str:starttime>/<str:finishtime>", views.TempSeriesPerTime.as_view(), name="TempSeriesValuePerTime"),
+   path("tempseriescompletepertime/<str:idstation>/<str:value>/<str:starttime>/<str:finishtime>", views.TempSeriesCompletePerTime.as_view(), name="TempSeriesCompletePerTime"),
    path("tempseriespertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.TempSeriesPerTime.as_view(), name="TempSeriesPerTime"),
    path("tempseriesobspertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.TempSeriesOBSPerTime.as_view(), name="TempSeriesOBSPerTime"),
    path("counts", views.ContarRegistrosAPIView.as_view(), name="contar_registros"),
