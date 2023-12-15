@@ -151,7 +151,7 @@ class WinddirectionCompletePertTime(generics.GenericAPIView):
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
 
 
-class AshfallpredictionPertTime(generics.GenericAPIView):
+class AshfallpredictionCompletePertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
     pagination_class = PageNumberPagination
     pagination_class.page_size = 10
