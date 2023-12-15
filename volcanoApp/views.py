@@ -125,7 +125,7 @@ class WinddirectionPertTime(generics.GenericAPIView):
         except Exception as e:
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
 
-class WinddirectionPertTime(generics.GenericAPIView):
+class WinddirectionCompletePertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
 
     def get(self, request, idvolcano, starttime, finishtime,value= "vwinddir"):
