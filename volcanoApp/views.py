@@ -190,10 +190,11 @@ class TempSeriesPerTime(generics.GenericAPIView):
             return Response({'results': response_data})
         except Exception as e:
             return Response({'error': str(e)})
-        
+from rest_framework.pagination import PageNumberPagination      
 class TempSeriesCompletePerTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
-    page = 10
+    pagination_class = PageNumberPagination
+    pagination_class.page_size = 10
     def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
         try:
             idstation = idstation
