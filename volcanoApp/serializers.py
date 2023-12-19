@@ -176,7 +176,10 @@ class VolcanoSerializer(ModelSerializer):
         model = Volcano
         fields = '__all__'
 
-
+class AlertPushSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Alert
+        fields = '__all__'
  
 class AlertSerializer(serializers.ModelSerializer):
     class Meta:

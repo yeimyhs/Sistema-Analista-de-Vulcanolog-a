@@ -3,31 +3,35 @@ from django.dispatch import receiver
 from django.contrib.auth.models import User
 from volcanoApp.models import UserP, Alert
 
+from .serializers import AlertPushSerializer
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 import logging
-logger = logging.getLogger(__name__)
+import json
+
+
 
 @receiver(post_save, sender=Alert)
 def enviar_notificacion(sender, instance, **kwargs):
     channel_layer = get_channel_layer()
+    alert_serializer = AlertPushSerializer(instance)
     mensaje = {
-        'tipo': 'nueva_notificacion',
-        'mensaje': 'Se ha guardado un nuevo objeto',
-        'id_alerta': instance  # Puedes enviar detalles relevantes sobre la alerta
+        'mensaje': f'Se ha generado una alerta {alert_serializer.data}',
     }
     # Obtener el canal específico para el volcán asociado a la alerta
-    canal_volcan = f"volcan_{instance.idvolcano.shortnamevol}"  # Suponiendo que 'idvolcano' es el campo ForeignKey en Alert
-        
-    # Enviar el mensaje al canal específico del 
+    canal_volcan = f"volcan_{instance.idvolcano.idvolcano.lower()}"
+    # Enviar el mensaje al canal específico del  
     print("==============================",canal_volcan)
-    # Agregar mensaje de registro para verificar el envío
-    logger.info(f"Enviando mensaje al canal: {canal_volcan}. Contenido: {mensaje}")
-    
-    # Enviar el mensaje al canal específico del volcán
-    async_to_sync(channel_layer.group_send)(canal_volcan, {"type": "enviar_mensaje", "contenido": mensaje})
+    async_to_sync(channel_layer.group_send)(canal_volcan, {
+        "type": "chat.message",  # Tipo de mensaje (debe coincidir con el tipo en consumers.py)
+        "message": json.dumps(mensaje),  # Convertir el mensaje a JSON para el envío
+    })
+    async_to_sync(channel_layer.send)('yei', {"type": "chat.message","message": "Hola a todos en esta sala!" })
+
+
+
 @receiver(post_save, sender=UserP)
 def sync_userp_data(sender, instance, **kwargs):
     try:

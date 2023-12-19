@@ -395,9 +395,11 @@ class LoginAPI(KnoxLoginView):
     @swagger_auto_schema( request_body=AuthTokenSerializer)
 
     def post(self, request, format=None):
-        print(request.data)
-        email = request.data.get('email', None)
-        password = request.data.get('password', None)
+        if 'email' not in request.data or 'password' not in request.data:
+            return Response({'error': 'Se requieren los campos "email" y "password" en la solicitud.'}, status=400)
+
+        email = request.data.get('email')
+        password = request.data.get('password')
 
         if email and password:
             try:
@@ -708,7 +710,7 @@ def index(request):
     }
 
     # Enviar el mensaje a través del canal "chat" a todos los clientes conectados
-    async_to_sync(channel_layer.group_send)("yei", {
+    async_to_sync(channel_layer.group_send)("volcan_yei", {
         "type": "chat.message",  # Tipo de mensaje (debe coincidir con el tipo en consumers.py)
         "message": json.dumps(message),  # Convertir el mensaje a JSON para el envío
     })
