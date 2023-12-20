@@ -686,6 +686,7 @@ class ContarRegistrosAPIView(APIView):
       
         caracterizaciones= Mask.objects.count()
         Series_Temporales= Temporaryseries.objects.count()
+        Ash_dispersion= Ashdispersion.objects.count()
         Wind_direction= Winddirection.objects.count()
         Ashfall_prediction = Ashfallprediction.objects.count()
 
@@ -714,6 +715,7 @@ class ContarRegistrosAPIView(APIView):
             'alerts_por_volcan': conteo_alertas_por_volcan,
             'usuarios_por_pais': usuarios_por_pais,
             'caracterizaciones': caracterizaciones,
+            'Ash_dispersion' : Ash_dispersion, 
             'Series_Temporales' : Series_Temporales, 
             'Wind_direction' :Wind_direction , 
             'Ashfall_prediction' : Ashfall_prediction, 
