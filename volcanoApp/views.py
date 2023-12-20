@@ -219,14 +219,15 @@ class AshdispersionPertTime(generics.GenericAPIView):
 class AshdispersionidNoticePertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
 
-    def get(self, request, idvolcano, starttime, finishtime,idnotice ,value= "jsonashdisp"):
+    def get(self, request, idvolcano, starttime, finishtime,idnoticept1, idnoticept2 ,value= "jsonashdisp"):
         try:
+            concatenated_idnotice = f"{idnoticept1}/{idnoticept2}"
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
             ADs_within_interval = Ashdispersion.objects.filter(
-                Q(idvolcano=idvolcano),Q(idnoticeashdisp=idnotice),
+                Q(idvolcano=idvolcano),Q(idnoticeashdisp=concatenated_idnotice),
                 starttimeashdisp__gte=starttime,
                 starttimeashdisp__lte=finishtime
             ).order_by('starttimeashdisp')
