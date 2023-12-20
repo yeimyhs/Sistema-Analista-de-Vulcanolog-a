@@ -62,6 +62,7 @@ urlpatterns = [
    path("ashfallpredictionperttime/<str:idvolcano>/<str:starttime>/<str:finishtime>", views.AshfallpredictionPertTime.as_view(), name="ashfallpredictionperttime"),
    path("ashfallpredictioncompleteperttime/<str:idvolcano>/<str:starttime>/<str:finishtime>", views.AshfallpredictionCompletePertTime.as_view(), name="AshfallpredictionCompletePertTime"),
    path("ashdispersionperttime/<str:idvolcano>/<str:starttime>/<str:finishtime>", views.AshdispersionPertTime.as_view(), name="ashdispersionperttime"),
+   path("ashdispersionidnoticeperttime/<str:idvolcano>/<str:idnotice>/<str:starttime>/<str:finishtime>", views.AshdispersionidNoticePertTime.as_view(), name="ashdispersionidnoticeperttime"),
    path("ashdispersioncompleteperttime/<str:idvolcano>/<str:starttime>/<str:finishtime>", views.AshdispersionCompletePertTime.as_view(), name="ashdispersioncompleteperttime"),
    path("maskimgrawpertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.MaskImgRawPerTime.as_view(), name="MaskImgRawPerTime"),
    path("blobsstationpermask/<str:idmask>", views.BlobsStationperMask.as_view(), name="BlobsStationperMask"),

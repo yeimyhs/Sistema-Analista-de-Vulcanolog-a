@@ -215,6 +215,27 @@ class AshdispersionPertTime(generics.GenericAPIView):
             return Response({'results': response_data})
         except Exception as e:
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
+        
+class AshdispersionidNoticePertTime(generics.GenericAPIView):
+    queryset = []  # Define una consulta ficticia
+
+    def get(self, request, idvolcano, starttime, finishtime,idnotice ,value= "jsonashdisp"):
+        try:
+            starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
+            finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
+            #lapsemin = int(lapsemin)
+            #starttime = starttime - timedelta(hours=6)
+            ADs_within_interval = Ashdispersion.objects.filter(
+                Q(idvolcano=idvolcano),Q(idnoticeashdisp=idnotice),
+                starttimeashdisp__gte=starttime,
+                starttimeashdisp__lte=finishtime
+            ).order_by('starttimeashdisp')
+            serializer = AshdispersionSerializer(ADs_within_interval, many=True)
+            response_data = [{'starttime': item['starttimeashdisp'], 'value': item[value], 'idnoticeashdisp':item['idnoticeashdisp'], 'idtypeashdisp':item['idtypeashdisp'] } for item in serializer.data]
+
+            return Response({'results': response_data})
+        except Exception as e:
+            return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
 class AshdispersionCompletePertTime(generics.GenericAPIView):
     queryset = []  # Define una consulta ficticia
     pagination_class = PageNumberPagination
@@ -321,7 +342,7 @@ class TempSeriesOBSPerTime(generics.GenericAPIView):
 
             # Genera una lista de diccionarios con la información requerida
             # = [{'starttimetempser': time, 'value': value, 'type': "NOC"} for time, value in zip(times, values)]
-            response_data = [{"time": UTCDateTime(time).strftime('%Y-%m-%dT%H:%M:%S.%f'), "value": value, 'type': "NOC"} for time, value in zip(times, values)]
+            response_data = [{"time": time, "value": value, 'type': "NOC"} for time, value in zip(times, values)]
 
             #serializer = TemporaryseriesSerializer(TSs_within_interval, many=True)
             #response_data = [{'starttimetempser': item['starttimetempser'], 'value': item[value], 'type' : item['ideventtype']} for item in serializer.data]
