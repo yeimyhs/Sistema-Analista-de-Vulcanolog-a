@@ -767,5 +767,5 @@ def listar_grupos_y_mensajes(request):
         messages = async_to_sync(channel_layer.llen)(group_key)
         print(f"Grupo: {group_key}, Mensajes pendientes: {messages}")
 
-def room(request, room_name):
-    return render(request, "chat/room.html", {"room_name": room_name})
+def room(request):
+    return render(request, "chat/room.html")

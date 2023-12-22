@@ -9,6 +9,6 @@ websocket_urlpatterns = [
         path('ws/realtime/<str:station_id>/', RealTimeDataConsumer.as_asgi()),
         #re_path(r'ws/notificaciones/$', NotificacionesConsumer.as_asgi()),
         #path('ws/chat/', Tsrealtime.as_asgi()),
-        re_path(r"ws/chat/(?P<room_name>\w+)/$", ChatConsumer.as_asgi()),
+        re_path(r"ws/notifpush/$", notifpush.as_asgi()),
         # Define tus rutas de WebSocket y los consumidores correspondientes
 ]

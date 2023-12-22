@@ -86,11 +86,10 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import WebsocketConsumer
 
 
-class ChatConsumer(WebsocketConsumer):
+class notifpush(WebsocketConsumer):
     def connect(self):
-        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
-        self.room_group_name = self.room_name
-        self.room_group_name = f"volcan_{self.room_name}"
+        self.room_name = self.scope["url_route"]["kwargs"]
+        self.room_group_name = "_volcan_push_"
         
         print(self.room_group_name)
         # Join room group

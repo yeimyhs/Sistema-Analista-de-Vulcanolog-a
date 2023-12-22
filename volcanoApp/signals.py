@@ -21,14 +21,13 @@ def enviar_notificacion(sender, instance, **kwargs):
         'mensaje': f'Se ha generado una alerta {alert_serializer.data}',
     }
     # Obtener el canal específico para el volcán asociado a la alerta
-    canal_volcan = f"volcan_{instance.idvolcano.idvolcano.lower()}"
+    canal_volcan = "_volcan_push_"
     # Enviar el mensaje al canal específico del  
-    print("==============================",canal_volcan)
+    #print("==============================",canal_volcan)
     async_to_sync(channel_layer.group_send)(canal_volcan, {
         "type": "chat.message",  # Tipo de mensaje (debe coincidir con el tipo en consumers.py)
         "message": json.dumps(mensaje),  # Convertir el mensaje a JSON para el envío
     })
-    async_to_sync(channel_layer.send)('yei', {"type": "chat.message","message": "Hola a todos en esta sala!" })
 
 
 
