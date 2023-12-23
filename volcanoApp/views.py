@@ -69,6 +69,9 @@ import json
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def password_reset_request(request):
+    """
+    Sericio de  solicitud de cambio de contrasenia
+    """
     if request.method == "POST":
         try:
             json_data = json.loads(request.body)
@@ -105,6 +108,9 @@ def password_reset_request(request):
 #----------------------------------------------------------------------MaskImgRawPerTime
 
 class WinddirectionPertTime(generics.GenericAPIView):
+    """
+    Sericio que recopila Direccion de Viento, respondiendo a un intervalo de tiempo con un formato especifico
+    """
     queryset = []  # Define una consulta ficticia
 
     def get(self, request, idvolcano, starttime, finishtime,value= "vwinddir"):
@@ -126,6 +132,9 @@ class WinddirectionPertTime(generics.GenericAPIView):
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
 
 class WinddirectionCompletePertTime(generics.GenericAPIView):
+    """
+    Sericio que recopila Direccion de Viento con detalles completos, respondiendo a un intervalo de tiempo con un formato especifico
+    """
     queryset = []  # Define una consulta ficticia
     pagination_class = PageNumberPagination
     pagination_class.page_size = 10
@@ -152,6 +161,9 @@ class WinddirectionCompletePertTime(generics.GenericAPIView):
 
 
 class AshfallpredictionCompletePertTime(generics.GenericAPIView):
+    """
+    Sericio que recopila Predicciones de caida de Ceniza con detalles completos ,respondiendo a un intervalo de tiempo con un formato especifico
+    """
     queryset = []  # Define una consulta ficticia
     pagination_class = PageNumberPagination
     pagination_class.page_size = 10
@@ -175,6 +187,9 @@ class AshfallpredictionCompletePertTime(generics.GenericAPIView):
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
 
 class AshfallpredictionPertTime(generics.GenericAPIView):
+    """
+    Sericio que recopila Predicciones de caida de Ceniza respondiendo a un intervalo de tiempo con un formato especifico
+    """
     queryset = []  # Define una consulta ficticia
     def get(self, request, idvolcano, starttime, finishtime,value= "jsonbodyashfall"):
         try:
@@ -194,6 +209,9 @@ class AshfallpredictionPertTime(generics.GenericAPIView):
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
 
 class AshdispersionPertTime(generics.GenericAPIView):
+    """
+    Sericio que recopila Dispersion de Ceniza tomando agrupaado por el idNotice mas reciente y luego respondiendo a un intervalo de tiempo con un formato especifico
+    """
     queryset = []  # Define una consulta ficticia
 
     def get(self, request, idvolcano, starttime, finishtime,value= "jsonashdisp"):
@@ -217,6 +235,9 @@ class AshdispersionPertTime(generics.GenericAPIView):
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
         
 class AshdispersionidNoticePertTime(generics.GenericAPIView):
+    """
+    Sericio que recopila Dispercion de Ceniza en base al idNotice y respondiendo a un intervalo de tiempo con un formato especifico
+    """
     queryset = []  # Define una consulta ficticia
 
     def get(self, request, idvolcano, starttime, finishtime,idnoticept1, idnoticept2 ,value= "jsonashdisp"):
@@ -238,6 +259,9 @@ class AshdispersionidNoticePertTime(generics.GenericAPIView):
         except Exception as e:
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
 class AshdispersionCompletePertTime(generics.GenericAPIView):
+    """
+    Sericio que recopila Dispercion de Ceniza con detalls completos ,respondiendo a un intervalo de tiempo con un formato especifico
+    """
     queryset = []  # Define una consulta ficticia
     pagination_class = PageNumberPagination
     pagination_class.page_size = 1
@@ -265,6 +289,9 @@ class AshdispersionCompletePertTime(generics.GenericAPIView):
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
 
 class TempSeriesPerTime(generics.GenericAPIView):
+    """
+    Sericio que recopila Series Temporales locales ,respondiendo a un intervalo de tiempo con un formato especifico
+    """
     queryset = []  # Define una consulta ficticia
 
     def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
@@ -287,6 +314,9 @@ class TempSeriesPerTime(generics.GenericAPIView):
             return Response({'error': str(e)})
 from rest_framework.pagination import PageNumberPagination      
 class TempSeriesCompletePerTime(generics.GenericAPIView):
+    """
+    Sericio que recopila Series Temporales almacenados en la BD local con detalles completos ,respondiendo a un intervalo de tiempo con un formato especifico
+    """
     queryset = []  # Define una consulta ficticia
     pagination_class = PageNumberPagination
     pagination_class.page_size = 10
@@ -318,6 +348,9 @@ from obspy import UTCDateTime
 import time
 
 class TempSeriesOBSPerTime(generics.GenericAPIView):
+    """
+    Sericio que selecciona las Series Temporales recopiladas por OBSPY ,respondiendo a un intervalo de tiempo con un formato especifico
+    """
     queryset = [] 
     def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
         try:
@@ -353,6 +386,9 @@ class TempSeriesOBSPerTime(generics.GenericAPIView):
             return Response({'error': str(e)})
 #----------------------------------------------------------------------MaskImgRawPerTime
 class BlobsStationperMask(generics.GenericAPIView):
+    """
+    Sericio que recopila Los Blobs con detalle de estacion, pertenecientes a una Mascara en especifico
+    """
     queryset = []  # Define una consulta ficticia
 
     def get(self, request, idmask):
@@ -369,6 +405,9 @@ class BlobsStationperMask(generics.GenericAPIView):
 #----------------------------------------------------------------------MaskImgRawPerTime
 
 class MaskImgRawPerTime(generics.GenericAPIView):
+    """
+    Sericio que recopila Imagenes Raw con sus Mascaras pertenecintes respondiendo a un intervalo de tiempo con un formato especifico
+    """
     queryset = []  # Define una consulta ficticia
 
     def get(self, request, idstation, starttime, finishtime):
@@ -397,6 +436,9 @@ class MaskImgRawPerTime(generics.GenericAPIView):
 
 # Register API
 class RegisterAPI(generics.GenericAPIView):
+    """
+    Sericio de registro de Usuarios
+    """
     permission_classes = (permissions.AllowAny,)
     serializer_class = RegisterSerializer
     @transaction.atomic
@@ -412,6 +454,9 @@ from knox.views import LoginView as KnoxLoginView
 from rest_framework.response import Response
 
 class LoginAPI(KnoxLoginView):
+    """
+    Sericio de inicio de Sesion
+    """
     
     permission_classes = (permissions.AllowAny,)
     @swagger_auto_schema( request_body=AuthTokenSerializer)
@@ -440,6 +485,9 @@ class LoginAPI(KnoxLoginView):
       #bytokenzs
 
 class UserAPI(generics.RetrieveAPIView):
+    """
+    Sericio retorno de detalles de usuario a partir del token de sesion
+    """
     permission_classes = [permissions.IsAuthenticated, ]
     serializer_class = UserPSerializer
     def get_object(self):
@@ -455,6 +503,7 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 
 class CustomPagination(PageNumberPagination):
+    
     page_size_query_param = 'page_size'  # Parámetro para especificar la cantidad de elementos por página
     #max_page_size = 100
     
@@ -476,6 +525,9 @@ class CustomPagination(PageNumberPagination):
  #----------------------------------------------------------------------mailer
 
 class mailer(APIView):
+    """
+    Sericio de envio de correo 
+    """
     permission_classes = [permissions.AllowAny, ]
     def post(self,request):
         subject= request.data["subject"]
@@ -499,6 +551,9 @@ class mailer(APIView):
  #----------------------------------------------------------------------
 
 class AlertViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Alerta generada
+    """
     queryset = Alert.objects.order_by('pk')
     serializer_class = AlertSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
@@ -517,6 +572,9 @@ class AlertViewSet(ModelViewSet):
 '''
 
 class AlertconfigurationViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Configuracionde Alerta para Volcanes
+    """
     queryset = Alertconfiguration.objects.order_by('pk')
     serializer_class = AlertconfigurationSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
@@ -536,48 +594,75 @@ class AlertconfigurationViewSet(ModelViewSet):
         return Response(data)
 
 class BlobViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Blobs
+    """
     queryset = Blob.objects.order_by('pk')
     serializer_class = BlobSerializer
 
 
 class EventtypeViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Tipos de Eventos
+    """
     queryset = Eventtype.objects.order_by('pk')
     serializer_class = EventtypeSerializer
 
 
 class HistoryViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Historial
+    """
     queryset = History.objects.order_by('pk')
     serializer_class = HistorySerializer
 
 
 class ImagesegmentationViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Raw Imagen
+    """
     queryset = Imagesegmentation.objects.order_by('pk')
     serializer_class = ImagesegmentationSerializer
 
 
 class MaskViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Mascaras
+    """
     queryset = Mask.objects.order_by('pk')
     serializer_class = MaskSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     #pagination_class = None
 
 class AshdispersionViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Dispesion de Ceniza
+    """
     queryset = Ashdispersion.objects.order_by('pk')
     serializer_class = AshdispersionSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
 
 class AshfallpredictionViewSet(ModelViewSet):
+    """
+    Sericio CRUD de prediccion en la caida de Cenizas
+    """
     queryset = Ashfallprediction.objects.order_by('pk')
     serializer_class = AshfallpredictionSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
 
 class WinddirectionViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Direccion del viento
+    """
     queryset = Winddirection.objects.order_by('pk')
     serializer_class = WinddirectionSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
 
 
 class StationViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Estacion
+    """
     queryset = Station.objects.order_by('pk')
     serializer_class = StationSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
@@ -597,15 +682,24 @@ class StationViewSet(ModelViewSet):
         return Response(data)
     
 class TemporaryseriesViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Series Temporales
+    """
     queryset = Temporaryseries.objects.order_by('pk')
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     serializer_class = TemporaryseriesSerializer
 class MappingViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Mapeo para los atributos de las tablas
+    """
     queryset = Mapping.objects.order_by('pk')
     serializer_class = MappingSerializer
 
 
 class UserPViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Usuarios
+    """
     queryset = UserP.objects.order_by('pk')
     serializer_class = UserPSerializer
     pagination_class = PageNumberPagination
@@ -647,6 +741,9 @@ class UserPViewSet(ModelViewSet):
                         status=status.HTTP_403_FORBIDDEN)
 
 class VolcanoViewSet(ModelViewSet):
+    """
+    Servicio CRUD para Volcano
+    """
     queryset = Volcano.objects.order_by('pk')
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     serializer_class = VolcanoSerializer
@@ -661,6 +758,9 @@ class VolcanoViewSet(ModelViewSet):
 
 
     def all(self, request):
+        """
+        listado de todos los volcanes
+        """
         queryset = Volcano.objects.all()
         data = VolcanoSerializer(queryset, many=True).data
         return Response(data)
@@ -669,7 +769,11 @@ from django.shortcuts import render
 from django.db.models import Count
 from django.db.models.functions import TruncMonth
 
+
 class ContarRegistrosAPIView(APIView):
+    """
+    Servicio de Dsahboard conteo de registros en diferentes tablas
+    """
     def get(self, request, *args, **kwargs):
         # Realizar el conteo de registros en diferentes modelos
         cantidad_registrosUserp = UserP.objects.count()
@@ -748,24 +852,6 @@ def pushnotif(request):
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
-def listar_grupos_y_mensajes(request):
-    channel_layer = get_channel_layer()
-
-    # Obtener todas las keys (claves) de los canales en Redis
-    all_channel_keys = async_to_sync(channel_layer.keys)('*')
-
-    # Filtrar solo las keys que son de tipo grupo (canales de grupos)
-    group_channel_keys = [key.decode('utf-8') for key in all_channel_keys if key.startswith("group")]
-
-    # Imprimir los nombres de los grupos encontrados
-    print("Grupos existentes:")
-    for group_key in group_channel_keys:
-        print(group_key)
-
-    # Verificar mensajes pendientes en cada grupo
-    for group_key in group_channel_keys:
-        messages = async_to_sync(channel_layer.llen)(group_key)
-        print(f"Grupo: {group_key}, Mensajes pendientes: {messages}")
 
 def room(request):
     return render(request, "chat/room.html")
