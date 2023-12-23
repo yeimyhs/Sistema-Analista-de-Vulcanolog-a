@@ -12,7 +12,7 @@ import logging
 import json
 
 
-
+#sirve para notificar dentro del canal una nueva alerta
 @receiver(post_save, sender=Alert)
 def enviar_notificacion(sender, instance, **kwargs):
     channel_layer = get_channel_layer()
@@ -20,17 +20,14 @@ def enviar_notificacion(sender, instance, **kwargs):
     mensaje = {
         'mensaje': f'Se ha generado una alerta {alert_serializer.data}',
     }
-    # Obtener el canal específico para el volcán asociado a la alerta
     canal_volcan = "_volcan_push_"
-    # Enviar el mensaje al canal específico del  
-    #print("==============================",canal_volcan)
     async_to_sync(channel_layer.group_send)(canal_volcan, {
-        "type": "chat.message",  # Tipo de mensaje (debe coincidir con el tipo en consumers.py)
-        "message": json.dumps(mensaje),  # Convertir el mensaje a JSON para el envío
+        "type": "chat.message",  
+        "message": json.dumps(mensaje),  
     })
 
-
-
+ 
+#cada que se guarde un usuario profile este se actualizara  en su user django 
 @receiver(post_save, sender=UserP)
 def sync_userp_data(sender, instance, **kwargs):
     try:
