@@ -1,46 +1,17 @@
 # En tu_app/consumers.py
 
 from channels.generic.websocket import AsyncWebsocketConsumer
-import json
 from channels.generic.websocket import WebsocketConsumer
 
-class Tsrealtime(WebsocketConsumer):
-    def connect(self):
-        self.accept()
-    def disconnect(self, close_code):
-        pass
-    def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        self.send(text_data=json.dumps({
-            'message': message
-        }))
-
-
-from channels.generic.websocket import AsyncWebsocketConsumer
-import json
-
-class NotificacionesConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        self.volcan_id = self.scope['url_route']['kwargs']['volcan_id']
-        self.group_name = f"volcan_{self.volcan_id}"
-        await self.channel_layer.group_add(self.group_name, self.channel_name)
-        await self.accept()
-
-    async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.group_name, self.channel_name)
-
-    async def enviar_mensaje(self, event):
-        mensaje = event['contenido']
-        await self.send(text_data=json.dumps(mensaje))
-
-
-from channels.generic.websocket import AsyncWebsocketConsumer
 import asyncio
 from obspy.clients.earthworm import Client
 from obspy import UTCDateTime
 import json
 
+from asgiref.sync import async_to_sync
+
+
+#
 class RealTimeDataConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.station_id = self.scope['url_route']['kwargs']['station_id']
@@ -79,19 +50,14 @@ class RealTimeDataConsumer(AsyncWebsocketConsumer):
                 print("Error:", e)
                 await asyncio.sleep(5)  # Espera 5 segundos antes de intentar nuevamente en caso de error
 
-# chat/consumers.py
-import json
-
-from asgiref.sync import async_to_sync
-from channels.generic.websocket import WebsocketConsumer
 
 
 class notifpush(WebsocketConsumer):
+    room_group_name = "volcan_push_"
+
     def connect(self):
-        self.room_name = self.scope["url_route"]["kwargs"]
-        self.room_group_name = "_volcan_push_"
         
-        print(self.room_group_name)
+        #print(self.room_group_name)
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name, self.channel_name
