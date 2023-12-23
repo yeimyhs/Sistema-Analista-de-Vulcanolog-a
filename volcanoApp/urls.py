@@ -53,7 +53,6 @@ urlpatterns = [
    
    path('', views.index, name='index'),
    path('pushnotifchanel/', views.pushnotif, name='pushnotif'),
-   path('listch/', views.listar_grupos_y_mensajes, name='listar_grupos_y_mensajes'),
    path("chat/", views.room, name="room"),
    #path("password_change", views.password_change, name="password_change"),
    path("winddirectionperttime/<str:idvolcano>/<str:starttime>/<str:finishtime>", views.WinddirectionPertTime.as_view(), name="winddirectionperttime"),
