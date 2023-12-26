@@ -135,12 +135,14 @@ class WinddirectionCompletePertTime(generics.GenericAPIView):
     """
     Sericio que recopila Direccion de Viento con detalles completos, respondiendo a un intervalo de tiempo con un formato especifico
     """
-    queryset = []  # Define una consulta ficticia
+    queryset = Winddirection.objects.all()
+    serializer_class = WinddirectionSerializer
     pagination_class = PageNumberPagination
     pagination_class.page_size = 10
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = '__all__'  # Campos por los que se puede ordenar
     
     def get(self, request, idvolcano, starttime, finishtime,value= "vwinddir"):
-        try:
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
@@ -150,15 +152,7 @@ class WinddirectionCompletePertTime(generics.GenericAPIView):
                 starttimewinddir__gte=starttime,
                 starttimewinddir__lte=finishtime
             )
-            
-            paginated_queryset = self.paginate_queryset(WDs_within_interval)
-            
-            serializer = WinddirectionSerializer(paginated_queryset, many=True)
-            
-            return self.get_paginated_response(serializer.data) 
-        except Exception as e:
-            return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
-
+            return WDs_within_interval
 
 class AshfallpredictionCompletePertTime(generics.GenericAPIView):
     """
@@ -313,34 +307,30 @@ class TempSeriesPerTime(generics.GenericAPIView):
         except Exception as e:
             return Response({'error': str(e)})
 from rest_framework.pagination import PageNumberPagination      
-class TempSeriesCompletePerTime(generics.GenericAPIView):
+class TempSeriesCompletePerTime(generics.ListAPIView):
     """
     Sericio que recopila Series Temporales almacenados en la BD local con detalles completos ,respondiendo a un intervalo de tiempo con un formato especifico
     """
-    queryset = []  # Define una consulta ficticia
+    queryset = Temporaryseries.objects.all()
+    serializer_class = TemporaryseriesSerializer
     pagination_class = PageNumberPagination
     pagination_class.page_size = 10
-    
-    def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
-        try:
-            idstation = idstation
-            starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
-            finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
-            #lapsemin = int(lapsemin)
-            #starttime = starttime - timedelta(hours=6)
-            TSs_within_interval = Temporaryseries.objects.filter(statetempser=1).filter(
-                Q(idstation=idstation),
-                starttimetempser__gte=starttime,
-                starttimetempser__lte=finishtime
-            )
-            paginated_queryset = self.paginate_queryset(TSs_within_interval)
-            
-            serializer = TemporaryseriesSerializer(paginated_queryset, many=True)
-            
-            return self.get_paginated_response(serializer.data) 
-        except Exception as e:
-            return Response({'error': str(e)})
-        
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = '__all__'  # Campos por los que se puede ordenar
+
+    def get_queryset(self):
+        idstation = self.kwargs['idstation']
+        starttime = datetime.strptime(self.kwargs['starttime'], '%Y-%m-%dT%H:%M:%S.%f')
+        finishtime = datetime.strptime(self.kwargs['finishtime'], '%Y-%m-%dT%H:%M:%S.%f')
+
+        queryset = self.queryset.filter(
+            Q(idstation=idstation),
+            starttimetempser__gte=starttime,
+            starttimetempser__lte=finishtime
+        )
+        return queryset
+
+
 from rest_framework.pagination import PageNumberPagination
 
 from obspy.clients.earthworm import Client
