@@ -204,7 +204,7 @@ class AshfallpredictionPertTime(generics.GenericAPIView):
 
 class AshdispersionPertTime(generics.GenericAPIView):
     """
-    Sericio que recopila Dispersion de Ceniza tomando agrupaado por el idNotice mas reciente y luego respondiendo a un intervalo de tiempo con un formato especifico
+    Sericio que recopila Dispersion de Ceniza respondiendo a un intervalo de tiempo con un formato especifico
     """
     queryset = []  # Define una consulta ficticia
 
@@ -214,10 +214,10 @@ class AshdispersionPertTime(generics.GenericAPIView):
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
-            noticeash= Ashdispersion.objects.order_by('starttimeashdisp').first().idnoticeashdisp
+            #noticeash= Ashdispersion.objects.order_by('starttimeashdisp').first().idnoticeashdisp
 
             ADs_within_interval = Ashdispersion.objects.filter(
-                Q(idvolcano=idvolcano),Q(idnoticeashdisp=noticeash),
+                Q(idvolcano=idvolcano),
                 starttimeashdisp__gte=starttime,
                 starttimeashdisp__lte=finishtime
             ).order_by('starttimeashdisp')
