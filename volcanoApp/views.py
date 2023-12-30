@@ -156,31 +156,28 @@ class WinddirectionCompletePertTime(generics.ListAPIView):
         return queryset.order_by(self.request.query_params.get('ordering', 'starttimewinddir'))
 
 
-class AshfallpredictionCompletePertTime(generics.GenericAPIView):
+class AshfallpredictionCompletePertTime(generics.ListAPIView):
     """
-    Sericio que recopila Predicciones de caida de Ceniza con detalles completos ,respondiendo a un intervalo de tiempo con un formato especifico
+    Servicio que recopila Predicciones de caída de Ceniza con detalles completos, respondiendo a un intervalo de tiempo con un formato específico
     """
-    queryset = []  # Define una consulta ficticia
+    queryset = Ashfallprediction.objects.all()
+    serializer_class = AshfallpredictionSerializer
     pagination_class = PageNumberPagination
     pagination_class.page_size = 10
-    def get(self, request, idvolcano, starttime, finishtime,value= "jsonbodyashfall"):
-        try:
-            starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
-            finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
-            #lapsemin = int(lapsemin)
-            #starttime = starttime - timedelta(hours=6)
-            WDs_within_interval = Ashfallprediction.objects.filter(
-                Q(idvolcano=idvolcano),
-                starttimeashfall__gte=starttime,
-                starttimeashfall__lte=finishtime
-            )
-            paginated_queryset = self.paginate_queryset(WDs_within_interval)
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = '__all__'  # Campos por los que se puede ordenar
 
-            serializer = AshfallpredictionSerializer(paginated_queryset, many=True)
-            
-            return self.get_paginated_response(serializer.data) 
-        except Exception as e:
-            return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
+    def get_queryset(self):
+        idvolcano = self.kwargs['idvolcano']
+        starttime = datetime.strptime(self.kwargs['starttime'], '%Y-%m-%dT%H:%M:%S.%f')
+        finishtime = datetime.strptime(self.kwargs['finishtime'], '%Y-%m-%dT%H:%M:%S.%f')
+
+        queryset = self.queryset.filter(
+            Q(idvolcano=idvolcano),
+            starttimeashfall__gte=starttime,
+            starttimeashfall__lte=finishtime
+        )
+        return queryset.order_by(self.request.query_params.get('ordering', 'starttimeashfall'))
 
 class AshfallpredictionPertTime(generics.GenericAPIView):
     """

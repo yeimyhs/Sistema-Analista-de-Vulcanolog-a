@@ -64,7 +64,12 @@ urlpatterns = [
         name="winddirectioncompleteperttime"
     ),
    path("ashfallpredictionperttime/<str:idvolcano>/<str:starttime>/<str:finishtime>", views.AshfallpredictionPertTime.as_view(), name="ashfallpredictionperttime"),
-   path("ashfallpredictioncompleteperttime/<str:idvolcano>/<str:starttime>/<str:finishtime>", views.AshfallpredictionCompletePertTime.as_view(), name="AshfallpredictionCompletePertTime"),
+   #path("ashfallpredictioncompleteperttime/<str:idvolcano>/<str:starttime>/<str:finishtime>", views.AshfallpredictionCompletePertTime.as_view(), name="AshfallpredictionCompletePertTime"),
+   re_path(
+    r"ashfallpredictioncompleteperttime/(?P<idvolcano>\w+)/(?P<value>\w+)/(?P<starttime>[\w\-.:%]+)/(?P<finishtime>[\w\-.:%]+)/",
+    views.AshfallpredictionCompletePertTime.as_view(),
+    name="ashfallpredictioncompleteperttime"
+),
    path("ashdispersionperttime/<str:idvolcano>/<str:starttime>/<str:finishtime>", views.AshdispersionPertTime.as_view(), name="ashdispersionperttime"),
    path("ashdispersionidnoticeperttime/<str:idvolcano>/<str:idnoticept1>/<str:idnoticept2>/<str:starttime>/<str:finishtime>", views.AshdispersionidNoticePertTime.as_view(), name="ashdispersionidnoticeperttime"),
    path("ashdispersioncompleteperttime/<str:idvolcano>/<str:starttime>/<str:finishtime>", views.AshdispersionCompletePertTime.as_view(), name="ashdispersioncompleteperttime"),
