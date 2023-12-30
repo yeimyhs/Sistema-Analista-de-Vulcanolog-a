@@ -131,9 +131,10 @@ class WinddirectionPertTime(generics.GenericAPIView):
         except Exception as e:
             return Response({'error': str(e)})#----------------------------------------------------------------------MaskImgRawPerTime
 
-class WinddirectionCompletePertTime(generics.GenericAPIView):
+
+class WinddirectionCompletePertTime(generics.ListAPIView):
     """
-    Sericio que recopila Direccion de Viento con detalles completos, respondiendo a un intervalo de tiempo con un formato especifico
+    Servicio que recopila Dirección de Viento con detalles completos, respondiendo a un intervalo de tiempo con un formato especifico
     """
     queryset = Winddirection.objects.all()
     serializer_class = WinddirectionSerializer
@@ -142,17 +143,18 @@ class WinddirectionCompletePertTime(generics.GenericAPIView):
     filter_backends = [filters.OrderingFilter]
     ordering_fields = '__all__'  # Campos por los que se puede ordenar
     
-    def get(self, request, idvolcano, starttime, finishtime,value= "vwinddir"):
-            starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
-            finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
-            #lapsemin = int(lapsemin)
-            #starttime = starttime - timedelta(hours=6)
-            WDs_within_interval = Winddirection.objects.filter(
-                Q(idvolcano=idvolcano),
-                starttimewinddir__gte=starttime,
-                starttimewinddir__lte=finishtime
-            )
-            return WDs_within_interval
+    def get_queryset(self):
+        idvolcano = self.kwargs['idvolcano']
+        starttime = datetime.strptime(self.kwargs['starttime'], '%Y-%m-%dT%H:%M:%S.%f')
+        finishtime = datetime.strptime(self.kwargs['finishtime'], '%Y-%m-%dT%H:%M:%S.%f')
+
+        queryset = self.queryset.filter(
+            Q(idvolcano=idvolcano),
+            starttimewinddir__gte=starttime,
+            starttimewinddir__lte=finishtime
+        )
+        return queryset.order_by(self.request.query_params.get('ordering', 'starttimewinddir'))
+
 
 class AshfallpredictionCompletePertTime(generics.GenericAPIView):
     """
