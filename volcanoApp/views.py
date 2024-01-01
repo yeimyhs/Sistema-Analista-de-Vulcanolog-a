@@ -844,3 +844,28 @@ from asgiref.sync import async_to_sync
 
 def room(request):
     return render(request, "chat/room.html")
+
+
+from django.shortcuts import render
+
+
+
+# views.py
+from django.http import JsonResponse
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+
+def enviar_alerta(request):
+    if request.method == 'POST':
+        message = request.POST.get('message')  # Obtener el mensaje de la solicitud POST
+        # Enviar la alerta al consumidor de WebSocket
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            'canal_notif_alert',  # Nombre del grupo para enviar alertas
+            {'type': 'send.notification', 'message': message}
+        )
+        return JsonResponse({'status': 'success', 'message': 'Alerta enviada correctamente'})
+    return JsonResponse({'status': 'error', 'message': 'Método no permitido'})
+
+def abrir_socket(request):
+    return render(request, 'tu_template.html')

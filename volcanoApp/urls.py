@@ -95,6 +95,14 @@ urlpatterns = [
     re_path(r'^swagger(<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+
+
+
+
+    path('enviar-alerta/', views.enviar_alerta, name='enviar_alerta'),
+    path('abrir-socket/', views.abrir_socket, name='abrir_socket'),
+    # Otros patrones de URL de tu aplicación...
+
 ]
 
 router = SimpleRouter()

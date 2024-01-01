@@ -53,37 +53,32 @@ class RealTimeDataConsumer(AsyncWebsocketConsumer):
 
 
 class notifpush(WebsocketConsumer):
-    room_group_name = "volcan_push_"
-
     def connect(self):
-        
-        #print(self.room_group_name)
-        # Join room group
+        self.room_group_name = "canal_notif_alert"
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name, self.channel_name
         )
-
         self.accept()
 
     def disconnect(self, close_code):
-        # Leave room group
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name, self.channel_name
         )
 
-    # Receive message from WebSocket
     def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        message = text_data_json["message"]
+        # Aquí es donde puedes manejar los mensajes entrantes si es necesario
+        pass
 
-        # Send message to room group
+    def send_notification(self, message):
+        # Método para enviar notificaciones al grupo
         async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name, {"type": "chat.message", "message": message}
+            self.room_group_name, {
+                "type": "send.notification",
+                "message": message
+            }
         )
 
-    # Receive message from room group
-    def chat_message(self, event):
+    def send_notification_to_client(self, event):
+        # Método para enviar la notificación al cliente conectado
         message = event["message"]
-
-        # Send message to WebSocket
         self.send(text_data=json.dumps({"message": message}))

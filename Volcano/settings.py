@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,8 +28,8 @@ DEBUG = True
 
 #ALLOWED_HOSTS = []
 #descpmentaar---------------------------------------
-ALLOWED_HOSTS = ['134.122.125.35', '127.0.0.1', 'localhost']
-DOMAIN = '134.122.125.35'
+ALLOWED_HOSTS = ['179.43.98.13', '127.0.0.1', 'localhost']
+DOMAIN = '179.43.98.13'
 
 
 # Application definition
@@ -118,8 +119,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'volcano2',
         'HOST' : '127.0.0.1',
-        'USER' : 'lonccos',
-        'PASSWORD' : 'sistemas',
+        'USER' : 'postgres',
+        'PASSWORD' : '#1gp_Saba_Web_0308#',
         'PORT' : '5432',    
     },
 
@@ -174,18 +175,16 @@ USE_I18N = True
 USE_TZ = True
 
 CORS_ALLOWED_ORIGINS = [
-    "https://134.122.125.35",
+    "https://179.43.98.13",
     "http://localhost:3000",
     "http://localhost:8001",
-    "http://localhost:8004",
     "http://127.0.0.1:9000",
 ]
 
 CORS_ORIGIN_WHITELIST = [
-    "https://134.122.125.35",
+    "https://179.43.98.13",
     "http://localhost:3000",
     "http://localhost:8001",
-    "http://localhost:8004",
     "http://127.0.0.1:9000",
 ]
 CORS_ORIGIN_ALLOW_ALL = True
