@@ -1,0 +1,24 @@
+<!-- tu_template.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notificaciones</title>
+</head>
+<body>
+    <h1>Canal de Notificaciones</h1>
+    <script>
+        // Lógica del cliente para conectarse al canal de notificaciones
+        const ws = new WebSocket('ws://tu-dominio/ws/notif/alert/');
+
+        ws.onopen = function () {
+            console.log('Conexión establecida al canal de notificaciones');
+        };
+
+        ws.onmessage = function (event) {
+            const message = JSON.parse(event.data).message;
+            // Lógica para manejar las notificaciones recibidas desde el servidor
+            console.log('Mensaje recibido:', message);
+        };
+    </script>
+</body>
+</html>
