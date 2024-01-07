@@ -8,7 +8,9 @@
     <h1>Canal de Notificaciones</h1>
     <script>
         // Lógica del cliente para conectarse al canal de notificaciones
-        const ws = new WebSocket('ws://tu-dominio/ws/notif/alert/');
+        const ws = new WebSocket('ws://'
+        + window.location.host+
+        '/ws/notifpush/');
 
         ws.onopen = function () {
             console.log('Conexión establecida al canal de notificaciones');

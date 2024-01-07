@@ -209,6 +209,10 @@ MEDIA_URL = 'volcanoApp/media/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+
+IMAGES_URL = '/var/www/html/'
+IMAGES_ROOT = '/var/www/html/image/'
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587

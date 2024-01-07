@@ -51,6 +51,76 @@ class RealTimeDataConsumer(AsyncWebsocketConsumer):
                 await asyncio.sleep(5)  # Espera 5 segundos antes de intentar nuevamente en caso de error
 
 
+from asgiref.sync import async_to_sync
+from channels.generic.websocket import WebsocketConsumer
+
+
+class ChatConsumer(WebsocketConsumer):
+    def connect(self):
+        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        self.room_group_name = self.room_name
+        self.room_group_name = f"volcan_{self.room_name}"
+        
+        print(self.room_group_name)
+        # Join room group
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name, self.channel_name
+        )
+
+        self.accept()
+
+    def disconnect(self, close_code):
+        # Leave room group
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name, self.channel_name
+        )
+
+    # Receive message from WebSocket
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json["message"]
+
+        # Send message to room group
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name, {"type": "chat.message", "message": message}
+        )
+
+    # Receive message from room group
+    def chat_message(self, event):
+        message = event["message"]
+
+        # Send message to WebSocket
+        self.send(text_data=json.dumps({"message": message}))
+
+from channels.generic.websocket import WebsocketConsumer
+import threading
+import time
+
+class CountingWebSocketConsumer(WebsocketConsumer):
+    def connect(self):
+        self.accept()
+
+        # Inicia un hilo para la cuenta infinita
+        self.count_thread = threading.Thread(target=self.start_counting)
+        self.count_thread.daemon = True  # El hilo terminará cuando el consumidor se desconecte
+        self.count_thread.start()
+
+    def disconnect(self, close_code):
+        # Detiene el hilo si está corriendo
+        if hasattr(self, 'count_thread') and self.count_thread.is_alive():
+            self.count_thread.do_run = False  # Marca la bandera para que el hilo termine
+
+    def start_counting(self):
+        count = 0
+        while getattr(threading.currentThread(), "do_run", True):
+            # Realiza la cuenta infinita
+            count += 1
+
+            # Envía el resultado a los clientes conectados
+            self.send(text_data=str(count))
+
+            # Simula el tiempo entre cuentas
+            time.sleep(1)
 
 class notifpush(WebsocketConsumer):
     def connect(self):
@@ -69,16 +139,14 @@ class notifpush(WebsocketConsumer):
         # Aquí es donde puedes manejar los mensajes entrantes si es necesario
         pass
 
-    def send_notification(self, message):
-        # Método para enviar notificaciones al grupo
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name, {
-                "type": "send.notification",
-                "message": message
-            }
-        )
-
     def send_notification_to_client(self, event):
         # Método para enviar la notificación al cliente conectado
         message = event["message"]
+        self.send(text_data=json.dumps({"message": message}))
+
+    # Método para manejar mensajes enviados desde otra parte de la aplicación
+    def send_notification_from_server(self, event):
+        message = event["message"]
+        # Realizar acciones con el mensaje enviado desde otro lugar de la aplicación
+        # Enviar el mensaje de vuelta a los clientes conectados
         self.send(text_data=json.dumps({"message": message}))

@@ -59,14 +59,14 @@ urlpatterns = [
    path("winddirectionperttime/<str:idvolcano>/<str:value>/<str:starttime>/<str:finishtime>", views.WinddirectionPertTime.as_view(), name="winddirectionperttime"),
    #path("winddirectioncompleteperttime/<str:idvolcano>/<str:value>/<str:starttime>/<str:finishtime>", views.WinddirectionCompletePertTime.as_view(), name="winddirectioncompleteperttime"),
    re_path(
-        r"winddirectioncompleteperttime/(?P<idvolcano>\w+)/(?P<value>\w+)/(?P<starttime>[\w\-.:%]+)/(?P<finishtime>[\w\-.:%]+)/",
+        r"winddirectioncompleteperttime/(?P<idvolcano>\w+)/(?P<starttime>[\w\-.:%]+)/(?P<finishtime>[\w\-.:%]+)/",
         views.WinddirectionCompletePertTime.as_view(),
         name="winddirectioncompleteperttime"
     ),
    path("ashfallpredictionperttime/<str:idvolcano>/<str:starttime>/<str:finishtime>", views.AshfallpredictionPertTime.as_view(), name="ashfallpredictionperttime"),
    #path("ashfallpredictioncompleteperttime/<str:idvolcano>/<str:starttime>/<str:finishtime>", views.AshfallpredictionCompletePertTime.as_view(), name="AshfallpredictionCompletePertTime"),
    re_path(
-    r"ashfallpredictioncompleteperttime/(?P<idvolcano>\w+)/(?P<value>\w+)/(?P<starttime>[\w\-.:%]+)/(?P<finishtime>[\w\-.:%]+)/",
+    r"ashfallpredictioncompleteperttime/(?P<idvolcano>\w+)/(?P<starttime>[\w\-.:%]+)/(?P<finishtime>[\w\-.:%]+)/",
     views.AshfallpredictionCompletePertTime.as_view(),
     name="ashfallpredictioncompleteperttime"
 ),
@@ -77,7 +77,7 @@ urlpatterns = [
    path("blobsstationpermask/<str:idmask>", views.BlobsStationperMask.as_view(), name="BlobsStationperMask"),
    path("tempseriespertime/<str:idstation>/<str:value>/<str:starttime>/<str:finishtime>", views.TempSeriesPerTime.as_view(), name="TempSeriesValuePerTime"),
    re_path(
-        r"tempseriescompletepertime/(?P<idstation>\w+)/(?P<value>\w+)/(?P<starttime>[\w\-.:%]+)/(?P<finishtime>[\w\-.:%]+)/",
+        r"tempseriescompletepertime/(?P<idstation>\w+)/(?P<starttime>[\w\-.:%]+)/(?P<finishtime>[\w\-.:%]+)/",
         views.TempSeriesCompletePerTime.as_view(),
         name="TempSeriesCompletePerTime"
     ),

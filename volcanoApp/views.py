@@ -854,18 +854,29 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
-
+from .consumers import notifpush
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from django.http import JsonResponse
 def enviar_alerta(request):
-    if request.method == 'POST':
-        message = request.POST.get('message')  # Obtener el mensaje de la solicitud POST
-        # Enviar la alerta al consumidor de WebSocket
+    try:
         channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            'canal_notif_alert',  # Nombre del grupo para enviar alertas
-            {'type': 'send.notification', 'message': message}
-        )
-        return JsonResponse({'status': 'success', 'message': 'Alerta enviada correctamente'})
-    return JsonResponse({'status': 'error', 'message': 'Método no permitido'})
 
+        # Enviar un mensaje al consumidor de WebSocket
+        message_from_server = {'message': 'Notificación desde otro lugar de la aplicación'}
+        group_name = "canal_notif_alert"  # El nombre del grupo al que deseas enviar el mensaje
+
+        # Enviar el mensaje a través del canal de capas con el nuevo tipo de mensaje
+        async_to_sync(channel_layer.group_send)(
+            group_name,
+            {
+                "type": "send.notification_from_server",  # Tipo de mensaje definido en el consumidor
+                "message": message_from_server
+            }
+        )
+
+        return JsonResponse({'status': 'success', 'message': 'Alerta enviada correctamente'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
 def abrir_socket(request):
     return render(request, 'tu_template.html')

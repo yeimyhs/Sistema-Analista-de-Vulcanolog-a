@@ -14,7 +14,7 @@
         const chatSocket = new WebSocket(
             'ws://'
             + window.location.host
-            + ':8004/ws/notifpush/'
+            + '/chat/alert/'
         );
 
         chatSocket.onmessage = function(e) {
