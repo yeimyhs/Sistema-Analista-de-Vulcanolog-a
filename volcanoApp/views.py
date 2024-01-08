@@ -421,17 +421,20 @@ class TempSeriesOBSCantPerTime(generics.GenericAPIView):
 #----------------------------------------------------------------------MaskImgRawPerTime
 class BlobsStationperMask(generics.GenericAPIView):
     """
-    Sericio que recopila Los Blobs con detalle de estacion, pertenecientes a una Mascara en especifico
+    Sericio que recopila Los Blobs con detalle de estacion y el volcan, pertenecientes a una Mascara en especifico
     """
     queryset = []  # Define una consulta ficticia
 
     def get(self, request, idmask):
       
             mask= Mask.objects.get(idmask = idmask)
+            station= mask.idstation
+            volcano= station.idvolcano
             blobs = Blob.objects.filter(idmask=idmask)
             results = []
             results.append({
-                'Station': StationSerializer(mask.idstation).data,
+                'Volcano':VolcanoSerializer(volcano).data,
+                'Station': StationSerializer(station).data,
                 'Blobs': BlobSerializer(blobs, many=True).data,
             })
             return Response({'results': results})
