@@ -341,7 +341,7 @@ class TempSeriesOBSPerTime(generics.GenericAPIView):
     Sericio que selecciona las Series Temporales recopiladas por OBSPY ,respondiendo a un intervalo de tiempo con un formato especifico
     """
     queryset = [] 
-    def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
+    def get(self, request, idstation, starttime, finishtime , value='waveskewnesstempser'):
         try:
             #starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
             #finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
@@ -363,6 +363,51 @@ class TempSeriesOBSPerTime(generics.GenericAPIView):
             values = trace.data
             times = trace.times()
 
+            # Genera una lista de diccionarios con la información requerida
+            # = [{'starttimetempser': time, 'value': value, 'type': "NOC"} for time, value in zip(times, values)]
+            response_data = [{"time": time, "value": value, 'type': "NOC"} for time, value in zip(times, values)]
+
+            #serializer = TemporaryseriesSerializer(TSs_within_interval, many=True)
+            #response_data = [{'starttimetempser': item['starttimetempser'], 'value': item[value], 'type' : item['ideventtype']} for item in serializer.data]
+            return Response({'results': response_data})
+        
+        except Exception as e:
+            return Response({'error': str(e)})
+        
+
+
+from obspy import Stream, Trace
+
+
+class TempSeriesOBSCantPerTime(generics.GenericAPIView):
+    """
+    Sericio que selecciona las Series Temporales recopiladas por OBSPY ,respondiendo a un intervalo de tiempo con un formato especifico
+    """
+    queryset = [] 
+    def get(self, request, idstation, starttime, finishtime, cantidad , value='waveskewnesstempser'):
+        try:
+            segmento =  100 // cantidad
+            #starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
+            #finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
+            t1 = UTCDateTime(starttime)
+            t2 = UTCDateTime(finishtime)
+            client = Client("10.0.20.55",16025)
+            st = client.get_waveforms("PE", idstation, "", "BH?", t1, t2)
+
+            #lapsemin = int(lapsemin)
+            #starttime = starttime - timedelta(hours=6)
+            '''TSs_within_interval = Temporaryseries.objects.filter(
+                Q(idstation=idstation),
+                starttimetempser__gte=starttime,
+                starttimetempser__lte=finishtime
+            )'''
+            
+            trace = st[0]  # Suponiendo que st es la lista de traces que obtuviste de ObsPy
+            # Accede a los valores de la serie temporal y los tiempos correspondientes
+            stream = Stream(traces=[trace])
+            stream.decimate(segmento, strict_length=False, no_filter=True)
+            #values = trace.data
+            times = trace.times()
             # Genera una lista de diccionarios con la información requerida
             # = [{'starttimetempser': time, 'value': value, 'type': "NOC"} for time, value in zip(times, values)]
             response_data = [{"time": time, "value": value, 'type': "NOC"} for time, value in zip(times, values)]
@@ -880,3 +925,7 @@ def enviar_alerta(request):
         return JsonResponse({'status': 'error', 'message': str(e)})
 def abrir_socket(request):
     return render(request, 'tu_template.html')
+
+def ejemplo_realtime(request):
+    return render(request, 'realtime/base.html', context={'text': 'Hello'})
+

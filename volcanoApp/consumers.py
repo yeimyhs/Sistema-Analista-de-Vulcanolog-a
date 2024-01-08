@@ -150,3 +150,13 @@ class notifpush(WebsocketConsumer):
         # Realizar acciones con el mensaje enviado desde otro lugar de la aplicación
         # Enviar el mensaje de vuelta a los clientes conectados
         self.send(text_data=json.dumps({"message": message}))
+
+from random import randint
+from time import sleep
+
+class realtimeSTobspy(WebsocketConsumer):
+    def connect(self):
+        self.accept()
+        for i in range (1000):
+            self.send(json.dumps({'value': randint(-20,20)}))
+            sleep(1)

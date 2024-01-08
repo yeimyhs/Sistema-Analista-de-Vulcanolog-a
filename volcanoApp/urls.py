@@ -51,9 +51,11 @@ urlpatterns = [
     path('logoutall/', knox_views.LogoutAllView.as_view(), name='logoutall'),#cuando inicia sesion en varios browser y quiere salir de todos
     path('userbyToken/', views.UserAPI.as_view()),
    
-   path('', views.index, name='index'),
-   path('pushnotifchanel/', views.pushnotif, name='pushnotif'),
-   path("chat/", views.room, name="room"),
+   #path('', views.index, name='index'),
+   #path('pushnotifchanel/', views.pushnotif, name='pushnotif'),
+   #path("chat/", views.room, name="room"),
+
+
    #path("password_change", views.password_change, name="password_change"),
    path("winddirectionperttime/<str:idvolcano>/<str:starttime>/<str:finishtime>", views.WinddirectionPertTime.as_view(), name="winddirectionperttime"),
    path("winddirectionperttime/<str:idvolcano>/<str:value>/<str:starttime>/<str:finishtime>", views.WinddirectionPertTime.as_view(), name="winddirectionperttime"),
@@ -83,6 +85,7 @@ urlpatterns = [
     ),
    path("tempseriespertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.TempSeriesPerTime.as_view(), name="TempSeriesPerTime"),
    path("tempseriesobspertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.TempSeriesOBSPerTime.as_view(), name="TempSeriesOBSPerTime"),
+   path("tempseriesobscantpertime/<str:idstation>/<int:cantidad>/<str:starttime>/<str:finishtime>", views.TempSeriesOBSCantPerTime.as_view(), name="TempSeriesOBSPerTime"),
    path("counts", views.ContarRegistrosAPIView.as_view(), name="contar_registros"),
    ##path("meteorologicaldatapertime/<str:idstation>/<str:value>/<str:starttime>/<str:finishtime>", views.MeteorologicalDataPertTime.as_view(), name="MeteorologicalDataPertTime"),
    ##path("meteorologicaldatapertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.MeteorologicalDataPertTime.as_view(), name="MeteorologicalDataPertTime"),
@@ -98,7 +101,7 @@ urlpatterns = [
 
 
 
-
+   path('ejemplo-realtime/' , views.ejemplo_realtime, name='realtime'),
     path('enviar-alerta/', views.enviar_alerta, name='enviar_alerta'),
     path('abrir-socket/', views.abrir_socket, name='abrir_socket'),
     # Otros patrones de URL de tu aplicación...
