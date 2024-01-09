@@ -124,11 +124,15 @@ class CountingWebSocketConsumer(WebsocketConsumer):
 
 class notifpush(WebsocketConsumer):
     def connect(self):
+        print("---holi")
+        
         self.room_group_name = "canal_notif_alert"
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name, self.channel_name
         )
         self.accept()
+        print("---holi")
+
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
@@ -152,11 +156,46 @@ class notifpush(WebsocketConsumer):
         self.send(text_data=json.dumps({"message": message}))
 
 from random import randint
-from time import sleep
+from channels.generic.websocket import AsyncWebsocketConsumer
+from asyncio import sleep
 
-class realtimeSTobspy(WebsocketConsumer):
-    def connect(self):
-        self.accept()
-        for i in range (1000):
-            self.send(json.dumps({'value': randint(-20,20)}))
-            sleep(1)
+
+from obspy.clients.earthworm import Client
+from obspy import UTCDateTime
+import time
+class realtimeSTobspy(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.accept()
+        earthworm_ip = '10.0.20.55'
+        earthworm_port = 16025
+        network = 'PE'
+        station = 'SAB'
+        location = ''
+        channel = 'BH?'
+
+        samplerate = 10.0
+        duration = 60 
+        # Conectar al servidor SeedLink
+        client = Client(earthworm_ip, earthworm_port)
+        t=1
+        while True:  # Bucle infin ito para enviar datos continuamente
+            current_time = UTCDateTime()
+            start_time = current_time - 3600
+            st = client.get_waveforms(network, station, location, channel, start_time, (start_time+t))
+            
+            if st:
+            # Procesa los datos
+                trace = st[0]
+                values = trace.data
+                times = trace.times()
+
+                # Crea y muestra la estructura {time, value}
+                result = [{"time": str(UTCDateTime(start_time + time)), "value": int(value)} for time, value in zip(times, values)]
+                #result = [{"time": UTCDateTime(start_time + time).strftime('%Y-%m-%dT%H:%M:%S.%f'), "value": value} for time, value in zip(times, values)]
+                await self.send(json.dumps({'value': result}))
+                
+                #num = randint(-20, 20)
+                #await self.send(json.dumps({'value': num}))
+                #print(num)
+                await sleep(1)
+
