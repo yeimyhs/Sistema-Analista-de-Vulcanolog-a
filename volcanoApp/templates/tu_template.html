@@ -10,7 +10,7 @@
         // Lógica del cliente para conectarse al canal de notificaciones
         const ws = new WebSocket('ws://'
         + window.location.host+
-        '/ws/notifpush/');
+        ':8003/ws/notifpush/');
 
         ws.onopen = function () {
             console.log('Conexión establecida al canal de notificaciones');

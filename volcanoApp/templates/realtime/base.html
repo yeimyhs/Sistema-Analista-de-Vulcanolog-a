@@ -1,17 +1,23 @@
-{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
-    <h1 id="app">{{ text }}</h1>
-    <!-- Aquí van tus enlaces a CSS, si es necesario -->
+    <title>WebSocket Example</title>
+    <!-- Tu contenido de encabezado, enlaces a CSS, etc. -->
 </head>
 <body>
+    <h1 id="app"></h1>
+    <h1 id="app2"></h1>
 
-<!-- Tu contenido HTML -->
+    <script>
+        const ws = new WebSocket('ws://' + window.location.host + '/ws/realtimestobspy/');
 
-<script src= "{% static 'main.js' %}">
-</script>
-
-<!-- Aquí van tus scripts adicionales, si es necesario -->
+        ws.onmessage = function(e) {
+            var djangoData = JSON.parse(e.data);
+            console.log(djangoData.value);
+            console.log(djangoData.time);
+            document.querySelector('#app').innerText = djangoData.value;
+            document.querySelector('#app2').innerText = djangoData.time;
+        }
+    </script>
 </body>
 </html>

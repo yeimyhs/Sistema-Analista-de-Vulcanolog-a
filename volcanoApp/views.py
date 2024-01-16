@@ -406,7 +406,7 @@ class TempSeriesOBSCantPerTime(generics.GenericAPIView):
             # Accede a los valores de la serie temporal y los tiempos correspondientes
             stream = Stream(traces=[trace])
             stream.decimate(segmento, strict_length=False, no_filter=True)
-            #values = trace.data
+            values = trace.data
             times = trace.times()
             # Genera una lista de diccionarios con la información requerida
             # = [{'starttimetempser': time, 'value': value, 'type': "NOC"} for time, value in zip(times, values)]

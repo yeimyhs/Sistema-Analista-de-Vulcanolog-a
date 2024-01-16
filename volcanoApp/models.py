@@ -18,10 +18,22 @@ class Alert(models.Model):
     idalertconf = models.ForeignKey('Alertconfiguration', on_delete=models.CASCADE, db_column='idAlertConf')  # Field name made lowercase.
     startalert = models.SmallIntegerField(db_column='startAlert', blank=True, null=True)  # Field name made lowercase.
     
+    longitudewinddir = models.FloatField(db_column='longitudeWinddir')  # Field name made lowercase.
+    latitudewinddir = models.FloatField(db_column='latitudeWinddir')  # Field name made lowercase.
+    idashdispersion = models.ForeignKey('idAshDispersion', models.DO_NOTHING, db_column='idAshDispersion')  # Field name made lowercase.
+    
     heighalert = models.FloatField(db_column='heighAlert')  # copiar de mask
     idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
     alertlevelalert  =models.CharField(max_length=10,db_column='alertLevelAlert')#copiar de volcan
-
+    '''
+    startimealert =
+    idevent = 
+    idimage = 
+    idmask = 
+    idashdirection
+    idashdispersion
+    idashfallprediction
+    '''
     class Meta:
         db_table = 'Alert'
     def generate_default_idalert(self):

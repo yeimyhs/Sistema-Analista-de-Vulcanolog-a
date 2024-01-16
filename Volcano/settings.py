@@ -108,7 +108,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Volcano.wsgi.application'
+#WSGI_APPLICATION = 'Volcano.wsgi.application'
 ASGI_APPLICATION = 'Volcano.asgi.application'
 
 # Database
