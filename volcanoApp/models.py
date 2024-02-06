@@ -8,7 +8,15 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-
+'''
+    startimealert =
+    idevent = 
+    idimage = 
+    idmask = 
+    idashdirection
+    idashdispersion
+    idashfallprediction
+    '''
 class Alert(models.Model):
     messagealert = models.TextField(db_column='messageAlert', blank = True)  # Field name made lowercase.
     idalert = models.CharField(max_length=24,db_column='idAlert', primary_key=True, blank= True) # Field name made lowercase.
@@ -18,22 +26,17 @@ class Alert(models.Model):
     idalertconf = models.ForeignKey('Alertconfiguration', on_delete=models.CASCADE, db_column='idAlertConf')  # Field name made lowercase.
     startalert = models.SmallIntegerField(db_column='startAlert', blank=True, null=True)  # Field name made lowercase.
     
-    longitudewinddir = models.FloatField(db_column='longitudeWinddir')  # Field name made lowercase.
-    latitudewinddir = models.FloatField(db_column='latitudeWinddir')  # Field name made lowercase.
-    idashdispersion = models.ForeignKey('idAshDispersion', models.DO_NOTHING, db_column='idAshDispersion')  # Field name made lowercase.
-    
+    longitudealert = models.FloatField(db_column='longitudeAlert', blank=True, null=True)  # Field name made lowercase.
+    latitudealert = models.FloatField(db_column='latitudeAlert', blank=True, null=True)  # Field name made lowercase.
+    idashdispersion = models.ForeignKey('AshDispersion', models.DO_NOTHING, db_column='idAshDispersion', blank=True, null=True)  # Field name made lowercase.
+    typealert =  models.SmallIntegerField(db_column='typeAlert')  # Field name made lowercase.
+
     heighalert = models.FloatField(db_column='heighAlert')  # copiar de mask
     idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
     alertlevelalert  =models.CharField(max_length=10,db_column='alertLevelAlert')#copiar de volcan
-    '''
-    startimealert =
-    idevent = 
-    idimage = 
-    idmask = 
-    idashdirection
-    idashdispersion
-    idashfallprediction
-    '''
+
+    idimgraw = models.ForeignKey('Imagesegmentation', models.DO_NOTHING, db_column='idPhoto')  # Field name made lowercase.
+
     class Meta:
         db_table = 'Alert'
     def generate_default_idalert(self):
@@ -268,7 +271,7 @@ class Station(models.Model):
     statestat = models.IntegerField(db_column='stateStat')  # Field name made lowercase.
     datecreationstat = models.DateTimeField(db_column='dateCreationStat',auto_now_add=True)  # Field name made lowercase.
     typestat = models.SmallIntegerField(db_column='typeStat', blank=True, null=True)  # Field name made lowercase.
-    idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano', blank=True, null=True)  # Field name made lowercase.
+    idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano')  # Field name made lowercase.
 
     class Meta:
         db_table = 'Station'

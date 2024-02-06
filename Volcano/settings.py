@@ -168,7 +168,7 @@ REST_FRAMEWORK = {
 
 LANGUAGE_CODE = 'es'
 
-TIME_ZONE = 'America/Lima'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 

@@ -181,6 +181,14 @@ class AlertPushSerializer(serializers.ModelSerializer):
         model = Alert
         fields = '__all__'
  
+
+class AshdispersionSerializer(ModelSerializer):
+
+    class Meta:
+        model = Ashdispersion
+        fields = '__all__'
+
+
 class AlertSerializer(serializers.ModelSerializer):
     class Meta:
         model = Alert
@@ -193,6 +201,10 @@ class AlertSerializer(serializers.ModelSerializer):
             # Obtener los detalles de Volcano y añadirlos a la representación
             volcano_details = instance.idvolcano
             representation['volcano_details'] = VolcanoSerializer(volcano_details).data
+            idImgRaw_details = instance.idimgraw
+            representation['idImgRaw_details'] = ImagesegmentationSerializer(idImgRaw_details).data
+            ash_dispersion_details = instance.idashdispersion
+            representation['ash_dispersion_details'] = AshdispersionSerializer(ash_dispersion_details).data
 
         return representation
 
@@ -363,8 +375,3 @@ class AshfallpredictionSerializer(ModelSerializer):
         model = Ashfallprediction
         fields = '__all__'
 
-class AshdispersionSerializer(ModelSerializer):
-
-    class Meta:
-        model = Ashdispersion
-        fields = '__all__'

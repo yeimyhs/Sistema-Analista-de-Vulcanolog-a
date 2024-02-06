@@ -155,19 +155,20 @@ class notifpush(WebsocketConsumer):
         # Enviar el mensaje de vuelta a los clientes conectados
         self.send(text_data=json.dumps({"message": message}))
 
-from random import randint
+from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
-from asyncio import sleep
-
 from obspy.clients.earthworm import Client
 from obspy import UTCDateTime
-from channels.generic.websocket import AsyncWebsocketConsumer
-from asyncio import sleep
 import json
+from asyncio import sleep
+from obspy import Stream, Trace
 
 class realtimeSTobspy(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
+        self.cantidad = int(self.scope['url_route']['kwargs']['cantidad']) - 1
+        self.segmento = 100 // self.cantidad
+
         self.earthworm_ip = '10.0.20.55'
         self.earthworm_port = 16025
         self.network = 'PE'
@@ -175,35 +176,39 @@ class realtimeSTobspy(AsyncWebsocketConsumer):
         self.location = ''
         self.channel = 'BH?'
 
-        self.samplerate = 10.0
-        self.duration = 60
-        await self.receive_loop()
+        await self.send_data_in_real_time()
 
-    async def receive_loop(self):
+    async def send_data_in_real_time(self):
         while True:
             current_time = UTCDateTime()
-            start_time = current_time
-            st = self.client.get_waveforms(
-                self.network, self.station, self.location, self.channel, start_time - 8, (start_time - 7)
-            )
+            start_time = current_time - 8
+            end_time = current_time - 7
 
-            if st:
-                trace = st[0]
-                values = trace.data
-                times = trace.times()
+            try:
+                client = Client(self.earthworm_ip, self.earthworm_port)
+                st = client.get_waveforms(self.network, self.station, self.location, self.channel, start_time, end_time)
 
-                result = [
-                    {"time": str(UTCDateTime(start_time + time)), "value": int(value)} for time, value in zip(times, values)
-                ]
+                if st:
+                    trace = st[0]
+                    trace.decimate(self.segmento, strict_length=False, no_filter=True)
+                    values = trace.data
+                    times = trace.times()
 
-                for entry in result:
-                    await self.send(text_data=json.dumps(entry))
-                    print(entry)
-                    await sleep(0.00001)
+                    result = [
+                        {"time": str(UTCDateTime(start_time + time)), "value": int(value)} for time, value in zip(times, values)
+                    ]
 
-                print("------------------------")
-                await sleep(1)
-            else:
+                    for entry in result:
+                        await self.send(text_data=json.dumps(entry))
+                        print(entry)
+                        await sleep(0.00001)
+
+                    print("------------------------")
+                    await sleep(1)
+                else:
+                    await sleep(1)
+            except Exception as e:
+                print(f"Error: {str(e)}")
                 await sleep(1)
 
     async def disconnect(self, close_code):

@@ -300,7 +300,7 @@ class TempSeriesPerTime(generics.GenericAPIView):
                 starttimetempser__lte=finishtime
             )
             serializer = TemporaryseriesSerializer(TSs_within_interval, many=True)
-            response_data = [{'starttimetempser': item['starttimetempser'], 'value': item[value], 'type' : item['ideventtype']} for item in serializer.data]
+            response_data = [{'starttimetempser': item['starttimetempser'], 'value': item[value], 'durationtempser' : item['durationtempser'], 'type' : item['ideventtype']} for item in serializer.data]
 
             return Response({'results': response_data})
         except Exception as e:
@@ -428,6 +428,7 @@ class BlobsStationperMask(generics.GenericAPIView):
     def get(self, request, idmask):
       
             mask= Mask.objects.get(idmask = idmask)
+            image= Imagesegmentation.objects.get(idphoto = idmask)
             station= mask.idstation
             volcano= station.idvolcano
             blobs = Blob.objects.filter(idmask=idmask)
@@ -436,6 +437,7 @@ class BlobsStationperMask(generics.GenericAPIView):
                 'Volcano':VolcanoSerializer(volcano).data,
                 'Station': StationSerializer(station).data,
                 'Blobs': BlobSerializer(blobs, many=True).data,
+                'imgRaw': ImagesegmentationSerializer(image).data,
             })
             return Response({'results': results})
      
@@ -661,7 +663,10 @@ class ImagesegmentationViewSet(ModelViewSet):
     queryset = Imagesegmentation.objects.order_by('pk')
     serializer_class = ImagesegmentationSerializer
 
-
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import action  # Add this import
+from rest_framework.response import Response
 class MaskViewSet(ModelViewSet):
     """
     Sericio CRUD de Mascaras
@@ -671,6 +676,126 @@ class MaskViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
     #pagination_class = None
 
+    @action(detail=True, methods=['get'])
+    def nearby_masks(self, request, pk=None):
+        """
+        Obtener el Mask siguiente y anterior más cercano en función de la fecha starttimemask
+        junto con los correspondientes Imagesegmentation de ambos.
+        """
+        current_mask = get_object_or_404(Mask, pk=pk)
+        queryset = Mask.objects.order_by('starttimemask')
+
+        previous_mask = queryset.filter(starttimemask__lt=current_mask.starttimemask).last()
+        next_mask = queryset.filter(starttimemask__gt=current_mask.starttimemask).first()
+
+        if previous_mask:
+            previous_imagesegmentation = previous_mask.idmask
+        else:
+            previous_imagesegmentation = None
+
+        if next_mask:
+            next_imagesegmentation = next_mask.idmask
+        else:
+            next_imagesegmentation = None
+
+        data = {
+            'previous_mask': MaskSerializer(previous_mask).data if previous_mask else None,
+            'previous_imagesegmentation': ImagesegmentationSerializer(previous_imagesegmentation).data if previous_imagesegmentation else None,
+            'current_mask': MaskSerializer(current_mask).data,
+            'current_imagesegmentation': ImagesegmentationSerializer(current_mask.idmask).data,
+            'next_mask': MaskSerializer(next_mask).data if next_mask else None,
+            'next_imagesegmentation': ImagesegmentationSerializer(next_imagesegmentation).data if next_imagesegmentation else None,
+        }
+
+        return Response(data)
+    
+    @action(detail=True, methods=['get'])
+    def find_related_masks(self, request, pk=None):
+        """
+        Encuentra máscaras relacionadas basadas en la estación y el tiempo de inicio.
+        """
+        mask = get_object_or_404(Mask, pk=pk)
+
+        # Obtener el id de la estación asociada a la máscara
+        station_id = mask.idstation_id
+
+        # Encontrar el id del volcán asociado a la estación
+        try:
+            station = Station.objects.get(idstation=station_id)
+            volcano_id = station.idvolcano_id
+        except Station.DoesNotExist:
+            return Response({'detail': 'Estación no encontrada'}, status=404)
+
+        # Encontrar estaciones gráficas asociadas al volcán
+        graphic_stations = Station.objects.filter(idvolcano=volcano_id, typestat=2)  # Suponiendo que el tipo gráfico es 2
+
+        # Inicializar la variable que indica si se encontró una estación gráfica
+        found_graphic_station = False
+
+        # Inicializar el diccionario para almacenar la información relacionada con cada estación gráfica
+        related_data_by_station = {}
+
+
+        # Encontrar máscaras relacionadas con el mismo starttimemask o con una calibración de tiempo de 10 segundos
+        for graphic_station in graphic_stations:
+            try:
+                related_mask = Mask.objects.get(
+                    idstation=graphic_station.idstation,
+                    starttimemask__range=(mask.starttimemask, mask.starttimemask + timedelta(seconds=10))
+                )
+                related_imagesegmentation = related_mask.idmask
+
+                related_data_by_station[graphic_station.idstation] = {
+                    'found_graphic_station': True,
+                    'related_mask': MaskSerializer(related_mask).data,
+                    'related_imagesegmentation': ImagesegmentationSerializer(related_imagesegmentation).data,
+                }
+
+                found_graphic_station = True
+            except Mask.DoesNotExist:
+                related_data_by_station[graphic_station.idstation] = {
+                    'found_graphic_station': False,
+                    'related_mask': None,
+                    'related_imagesegmentation': None,
+                }
+
+        response_data = {
+            'found_graphic_station': found_graphic_station,
+            'related_data_by_station': related_data_by_station,
+        }
+
+        return Response(response_data)
+    
+@api_view(['GET'])
+def find_common_start_time(request):
+    """
+    Encuentra un starttimemask que tenga máscaras existentes en cada estación.
+    """
+    # Obtener todas las estaciones
+    stations = Station.objects.all()
+
+    # Inicializar el diccionario para almacenar el starttimemask común por estación
+    common_start_time_by_station = {}
+
+    # Iterar sobre todas las estaciones
+    for station in stations:
+        # Encontrar el starttimemask más temprano para la estación actual
+        min_start_time = Mask.objects.filter(idstation=station.idstation).aggregate(Min('starttimemask'))['starttimemask__min']
+
+        # Verificar si se encontró algún starttimemask
+        if min_start_time is not None:
+            # Añadir el starttimemask más temprano al diccionario
+            common_start_time_by_station[station.idstation] = min_start_time
+        else:
+            # Si no se encontró, devolver un mensaje indicando que no hay starttimemask
+            return Response({'detail': f'No se encontró starttimemask para la estación {station.idstation}'})
+
+    # Encontrar el starttimemask común máximo entre todas las estaciones
+    common_start_time = max(common_start_time_by_station.values())
+
+    # Devolver el starttimemask común
+    return Response({'common_start_time': common_start_time})
+    
 class AshdispersionViewSet(ModelViewSet):
     """
     Sericio CRUD de Dispesion de Ceniza
@@ -801,6 +926,33 @@ class VolcanoViewSet(ModelViewSet):
         queryset = Volcano.objects.all()
         data = VolcanoSerializer(queryset, many=True).data
         return Response(data)
+
+    @action(detail=False, methods=['get'])
+    def volcano_type_stations(self, request):
+        """
+        Obtener información de todos los volcanes con arrays de estaciones sísmicas y visuales.
+        """
+        volcanoes = Volcano.objects.all()
+        volcano_data = []
+
+        for volcano in volcanoes:
+            seismic_stations = Station.objects.filter(idvolcano=volcano.idvolcano, typestat=1)  # Suponiendo que el tipo sísmico es 1
+            visual_stations = Station.objects.filter(idvolcano=volcano.idvolcano, typestat=2)   # Suponiendo que el tipo visual es 2
+
+            seismic_stations_data = [{'id': station.idstation, 'shortname': station.shortnamestat, 'longname': station.longnamestat} for station in seismic_stations]
+            visual_stations_data = [{'id': station.idstation, 'shortname': station.shortnamestat, 'longname': station.longnamestat} for station in visual_stations]
+
+            volcano_info = {
+                'idvolcano': volcano.idvolcano,
+                'shortnamevol': volcano.shortnamevol,
+                'longnamevol': volcano.longnamevol,
+                'seismic_stations': seismic_stations_data,
+                'visual_stations': visual_stations_data,
+            }
+
+            volcano_data.append(volcano_info)
+
+        return Response(volcano_data)
     
 from django.shortcuts import render
 from django.db.models import Count

@@ -9,7 +9,7 @@
     <h1 id="app2"></h1>
 
     <script>
-        const ws = new WebSocket('ws://' + window.location.host + '/ws/realtimestobspy/');
+        const ws = new WebSocket('ws://' + window.location.host + ':8003/ws/realtimestobspy/4/');
 
         ws.onmessage = function(e) {
             var djangoData = JSON.parse(e.data);

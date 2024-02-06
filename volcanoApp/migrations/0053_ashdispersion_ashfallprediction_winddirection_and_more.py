@@ -56,7 +56,7 @@ class Migration(migrations.Migration):
                 ('indwinddir', models.IntegerField(blank=True, db_column='indWinddir', null=True)),
                 ('statewinddir', models.SmallIntegerField(db_column='stateWinddir')),
                 ('datecreationwinddir', models.DateTimeField(auto_now_add=True, db_column='dateCreationWinddir')),
-                ('idwinddirection', models.CharField(db_column='idWinddirereorologicalData', max_length=21, primary_key=True, serialize=False)),
+                ('idwinddirection', models.CharField(db_column='idWinddir', max_length=21, primary_key=True, serialize=False)),
                 ('idwolcano', models.ForeignKey(blank=True, db_column='idVolcano', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='volcanoApp.volcano')),
             ],
             options={
