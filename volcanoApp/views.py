@@ -886,12 +886,13 @@ class TemporaryseriesViewSet(ModelViewSet):
 
 class ExplosionViewSet(ModelViewSet):
     """
-    Sericio CRUD de Series Temporales
+    Sericio CRUD de Explosion
     """
     queryset = Explosion.objects.order_by('pk')
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
-    search_fields = ['idstation__longnamevol','starttimetempser','idstation__shortnamestat']
+    search_fields = ['idstation__longnamevol','starttime','idstation__shortnamestat']
     filterset_fields = {
+        'idvolcano': ['exact'],#, 'icontains'
         'idstation': ['exact'],#, 'icontains'
         'starttime': ['exact', 'gte', 'lte', 'date'], # Permitir búsqueda exacta, mayor que, menor que, y por fecha
         'idstation__shortnamestat': ['exact', 'icontains'],
@@ -899,16 +900,17 @@ class ExplosionViewSet(ModelViewSet):
     serializer_class = ExplosionSerializer
 class AlarmViewSet(ModelViewSet):
     """
-    Sericio CRUD de Series Temporales
+    Sericio CRUD de Alarma
     """
     queryset = Alarm.objects.order_by('pk')
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
-    '''search_fields = ['idstation__longnamevol','starttimetempser','idstation__shortnamestat']
+    search_fields = ['idstation__longnamevol','starttime','idstation__shortnamestat']
     filterset_fields = {
-        'idStation': ['exact'],#, 'icontains'
-        'startTime ': ['exact', 'gte', 'lte', 'date'], # Permitir búsqueda exacta, mayor que, menor que, y por fecha
+        'idvolcano': ['exact'],#, 'icontains'
+        'idstation': ['exact'],#, 'icontains'
+        'starttime': ['exact', 'gte', 'lte'], # Permitir búsqueda exacta, mayor que, menor que, y por fecha
         'idstation__shortnamestat': ['exact', 'icontains'],
-    }'''
+    }
     serializer_class = AlarmSerializer
 
 class MappingViewSet(ModelViewSet):

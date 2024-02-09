@@ -376,12 +376,14 @@ class AshfallpredictionSerializer(ModelSerializer):
         fields = '__all__'
 
 
-class AlarmSerializer(ModelSerializer):
+from django.core.exceptions import ObjectDoesNotExist
 
+
+
+class ExplosionwithoutdetaiilsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Alarm
+        model = Explosion
         fields = '__all__'
-
 
 class ExplosionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -389,39 +391,78 @@ class ExplosionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def to_representation(self, instance):
-        #representation = super().to_representation(instance)
+        representation = super().to_representation(instance)
 
         if self.context['request'].method in ['GET', 'LIST']:
             # Obtener los detalles de los modelos relacionados y agregarlos a la representación
-            '''idevent_details = instance.idevent
-            representation['idevent_details'] = EventtypeSerializer(idevent_details).data
+            try:
+                if instance.idimage is not None:
+                    idimage_details = instance.idimage
+                    representation['idimage_details'] = ImagesegmentationSerializer(idimage_details).data
+            except ObjectDoesNotExist:
+                representation['idimage_details'] = None
             
-            idimage_details = instance.idimage
-            if idimage_details:
-                representation['idimage_details'] = ImagesegmentationSerializer(idimage_details).data
+            try:
+                idmask_details = instance.idmask
+                if idmask_details:
+                    representation['idmask_details'] = MaskSerializer(idmask_details).data
+            except ObjectDoesNotExist:
+                representation['idmask_details'] = None
             
-            idmask_details = instance.idmask
-            if idmask_details:
-                representation['idmask_details'] = MaskSerializer(idmask_details).data
+            try:
+                idwinddir_details = instance.idwinddir
+                if idwinddir_details:
+                    representation['idwinddir_details'] = WinddirectionSerializer(idwinddir_details).data
+            except ObjectDoesNotExist:
+                representation['idwinddir_details'] = None
             
-            idwinddir_details = instance.idwinddir
-            if idwinddir_details:
-                representation['idwinddir_details'] = WinddirectionSerializer(idwinddir_details).data
+            try:
+                idashdispersion_details = instance.idashdispersion
+                if idashdispersion_details:
+                    representation['idashdispersion_details'] = AshdispersionSerializer(idashdispersion_details).data
+            except ObjectDoesNotExist:
+                representation['idashdispersion_details'] = None
             
-            idashdispersion_details = instance.idashdispersion
-            if idashdispersion_details:
-                representation['idashdispersion_details'] = AshdispersionSerializer(idashdispersion_details).data
+            try:
+                idashfallprediction_details = instance.idashfallprediction
+                if idashfallprediction_details:
+                    representation['idashfallprediction_details'] = AshfallpredictionSerializer(idashfallprediction_details).data
+            except ObjectDoesNotExist:
+                representation['idashfallprediction_details'] = None
             
-            idashfallprediction_details = instance.idashfallprediction
-            if idashfallprediction_details:
-                representation['idashfallprediction_details'] = AshfallpredictionSerializer(idashfallprediction_details).data
-            '''
-            idvolcano_details = instance.idvolcano
-            if idvolcano_details:
-                representation['idvolcano_details'] = VolcanoSerializer(idvolcano_details).data
-            ''''
-            idstation_details = instance.idstation
-            if idstation_details:
-                representation['idstation_details'] = StationSerializer(idstation_details).data
-            '''
+            try:
+                idvolcano_details = instance.idvolcano
+                if idvolcano_details:
+                    representation['idvolcano_details'] = VolcanoSerializer(idvolcano_details).data
+            except ObjectDoesNotExist:
+                representation['idvolcano_details'] = None
+            
+            try:
+                idstation_details = instance.idstation
+                if idstation_details:
+                    representation['idstation_details'] = StationSerializer(idstation_details).data
+            except ObjectDoesNotExist:
+                representation['idstation_details'] = None
+
+        return representation
+class AlarmSerializer(ModelSerializer):
+    # Define un campo para representar los detalles de la idexplosion
+    #idexplosion_details = ExplosionSerializer(source='idexplosion', read_only=True)
+
+    class Meta:
+        model = Alarm
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        if self.context['request'].method in ['GET', 'LIST']:
+            # Obtener los detalles de los modelos relacionados y agregarlos a la representación
+            try:
+                if instance.idexplosion is not None:
+                    idexplosion_details = instance.idexplosion
+                    representation['idexplosion_details'] = ExplosionwithoutdetaiilsSerializer(idexplosion_details).data
+            except ObjectDoesNotExist:
+                representation['idexplosion_details'] = None
+
         return representation
