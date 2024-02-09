@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 from volcanoApp.serializers import AlertSerializer, AlertconfigurationSerializer, BlobSerializer, EventtypeSerializer, HistorySerializer, ImagesegmentationSerializer, MaskSerializer, StationSerializer, TemporaryseriesSerializer, VolcanoSerializer \
-    , UserPSerializer ,MappingSerializer, AshdispersionSerializer, WinddirectionSerializer, AshfallpredictionSerializer , AlarmSerializer,ExplosionSerializer
+    , UserPSerializer ,MappingSerializer, AshdispersionSerializer, WinddirectionSerializer, AshfallpredictionSerializer , AlarmSerializer,ExplosionSerializer,ExplosionwithoutdetaiilsSerializer,ReadOnlyExplosionSerializer
 from volcanoApp.models import Alert, Alertconfiguration, Blob, Eventtype, History, Imagesegmentation, Mask, Station, Temporaryseries, Volcano \
     , UserP, Mapping, Ashdispersion, Ashfallprediction, Winddirection, Explosion,Alarm
 import volcanoApp.filters  
@@ -900,10 +900,46 @@ class ExplosionViewSet(ModelViewSet):
     filterset_fields = {
         'idvolcano': ['exact'],#, 'icontains'
         'idstation': ['exact'],#, 'icontains'
+        'detectionmode': ['exact'],#, 'icontains'
         'starttime': ['exact', 'gte', 'lte', 'date'], # Permitir búsqueda exacta, mayor que, menor que, y por fecha
         'idstation__shortnamestat': ['exact', 'icontains'],
     }
     serializer_class = ExplosionSerializer
+    
+    @action(detail=True, methods=['get'])
+    def filter_by_station_graphic(self, request, pk=None):
+        explosion = self.get_object()
+
+        # Filtrar explosiones por estado detectionmode 'V'
+        explosions = Explosion.objects.filter(detectionmode='V')
+
+        # Obtener el volcán de la explosión
+        volcano_id = explosion.idvolcano_id
+
+        # Filtrar estaciones gráficas del volcán de la explosión
+        graphic_stations = Station.objects.filter(idvolcano=volcano_id, typestat=2)
+
+        # Inicializar el diccionario para almacenar las explosiones filtradas por estación gráfica
+        filtered_explosions_by_station = {}
+
+        # Filtrar explosiones por starttime
+        for graphic_station in graphic_stations:
+            # Filtrar explosiones por estación gráfica y starttime
+            filtered_explosions = explosions.filter(idstation=graphic_station.idstation, starttime__gte=explosion.starttime).order_by('starttime')
+
+            # Obtener el índice del evento actual
+            following_events = list(filtered_explosions[:4])
+
+            # Serializar las explosiones filtradas
+            serialized_explosions = ReadOnlyExplosionSerializer(following_events, many=True).data
+
+            # Almacenar los detalles de las explosiones por estación gráfica
+            filtered_explosions_by_station[graphic_station.idstation] = {
+                'explosions': serialized_explosions,
+                'starttime': explosion.starttime
+            }
+
+        return Response(filtered_explosions_by_station)
 class AlarmViewSet(ModelViewSet):
     """
     Sericio CRUD de Alarma

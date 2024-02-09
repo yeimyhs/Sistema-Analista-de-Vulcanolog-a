@@ -379,6 +379,67 @@ class AshfallpredictionSerializer(ModelSerializer):
 from django.core.exceptions import ObjectDoesNotExist
 
 
+from rest_framework.serializers import ModelSerializer
+
+class ReadOnlyExplosionSerializer(ModelSerializer):
+    class Meta:
+        model = Explosion
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        # Obtener los detalles de los modelos relacionados y agregarlos a la representación
+        try:
+            if instance.idimage is not None:
+                idimage_details = instance.idimage
+                representation['idimage_details'] = ImagesegmentationSerializer(idimage_details).data
+        except ObjectDoesNotExist:
+            representation['idimage_details'] = None
+        
+        try:
+            idmask_details = instance.idmask
+            if idmask_details:
+                representation['idmask_details'] = MaskSerializer(idmask_details).data
+        except ObjectDoesNotExist:
+            representation['idmask_details'] = None
+        
+        try:
+            idwinddir_details = instance.idwinddir
+            if idwinddir_details:
+                representation['idwinddir_details'] = WinddirectionSerializer(idwinddir_details).data
+        except ObjectDoesNotExist:
+            representation['idwinddir_details'] = None
+        
+        try:
+            idashdispersion_details = instance.idashdispersion
+            if idashdispersion_details:
+                representation['idashdispersion_details'] = AshdispersionSerializer(idashdispersion_details).data
+        except ObjectDoesNotExist:
+            representation['idashdispersion_details'] = None
+        
+        try:
+            idashfallprediction_details = instance.idashfallprediction
+            if idashfallprediction_details:
+                representation['idashfallprediction_details'] = AshfallpredictionSerializer(idashfallprediction_details).data
+        except ObjectDoesNotExist:
+            representation['idashfallprediction_details'] = None
+        
+        try:
+            idvolcano_details = instance.idvolcano
+            if idvolcano_details:
+                representation['idvolcano_details'] = VolcanoSerializer(idvolcano_details).data
+        except ObjectDoesNotExist:
+            representation['idvolcano_details'] = None
+        
+        try:
+            idstation_details = instance.idstation
+            if idstation_details:
+                representation['idstation_details'] = StationSerializer(idstation_details).data
+        except ObjectDoesNotExist:
+            representation['idstation_details'] = None
+
+        return representation
 
 class ExplosionwithoutdetaiilsSerializer(serializers.ModelSerializer):
     class Meta:
