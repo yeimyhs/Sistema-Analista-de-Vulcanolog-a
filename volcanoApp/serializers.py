@@ -5,7 +5,7 @@ pip install python-gammu https://pypi.org/project/python-gammu/
 '''
 from rest_framework.serializers import ModelSerializer
 from volcanoApp.models import Alert, Alertconfiguration, Blob, Eventtype, History, Imagesegmentation, Mask, Station, Temporaryseries, Volcano\
-, UserP, Mapping, Ashdispersion, Ashfallprediction, Winddirection
+, UserP, Mapping, Ashdispersion, Ashfallprediction, Winddirection, Explosion, Alarm
 
 from django.contrib.auth.models import User
 
@@ -375,3 +375,53 @@ class AshfallpredictionSerializer(ModelSerializer):
         model = Ashfallprediction
         fields = '__all__'
 
+
+class AlarmSerializer(ModelSerializer):
+
+    class Meta:
+        model = Alarm
+        fields = '__all__'
+
+
+class ExplosionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Explosion
+        fields = '__all__'
+
+    def to_representation(self, instance):
+        #representation = super().to_representation(instance)
+
+        if self.context['request'].method in ['GET', 'LIST']:
+            # Obtener los detalles de los modelos relacionados y agregarlos a la representación
+            '''idevent_details = instance.idevent
+            representation['idevent_details'] = EventtypeSerializer(idevent_details).data
+            
+            idimage_details = instance.idimage
+            if idimage_details:
+                representation['idimage_details'] = ImagesegmentationSerializer(idimage_details).data
+            
+            idmask_details = instance.idmask
+            if idmask_details:
+                representation['idmask_details'] = MaskSerializer(idmask_details).data
+            
+            idwinddir_details = instance.idwinddir
+            if idwinddir_details:
+                representation['idwinddir_details'] = WinddirectionSerializer(idwinddir_details).data
+            
+            idashdispersion_details = instance.idashdispersion
+            if idashdispersion_details:
+                representation['idashdispersion_details'] = AshdispersionSerializer(idashdispersion_details).data
+            
+            idashfallprediction_details = instance.idashfallprediction
+            if idashfallprediction_details:
+                representation['idashfallprediction_details'] = AshfallpredictionSerializer(idashfallprediction_details).data
+            '''
+            idvolcano_details = instance.idvolcano
+            if idvolcano_details:
+                representation['idvolcano_details'] = VolcanoSerializer(idvolcano_details).data
+            ''''
+            idstation_details = instance.idstation
+            if idstation_details:
+                representation['idstation_details'] = StationSerializer(idstation_details).data
+            '''
+        return representation

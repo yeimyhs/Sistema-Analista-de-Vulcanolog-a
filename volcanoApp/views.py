@@ -1,8 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
 from volcanoApp.serializers import AlertSerializer, AlertconfigurationSerializer, BlobSerializer, EventtypeSerializer, HistorySerializer, ImagesegmentationSerializer, MaskSerializer, StationSerializer, TemporaryseriesSerializer, VolcanoSerializer \
-    , UserPSerializer ,MappingSerializer, AshdispersionSerializer, WinddirectionSerializer, AshfallpredictionSerializer
+    , UserPSerializer ,MappingSerializer, AshdispersionSerializer, WinddirectionSerializer, AshfallpredictionSerializer , AlarmSerializer,ExplosionSerializer
 from volcanoApp.models import Alert, Alertconfiguration, Blob, Eventtype, History, Imagesegmentation, Mask, Station, Temporaryseries, Volcano \
-    , UserP, Mapping, Ashdispersion, Ashfallprediction, Winddirection
+    , UserP, Mapping, Ashdispersion, Ashfallprediction, Winddirection, Explosion,Alarm
 import volcanoApp.filters  
 from django.contrib.auth.models import User
 from rest_framework import viewsets, filters
@@ -287,7 +287,7 @@ class TempSeriesPerTime(generics.GenericAPIView):
     """
     queryset = []  # Define una consulta ficticia
 
-    def get(self, request, idstation, starttime, finishtime, value='waveskewnesstempser'):
+    def get(self, request, idstation, starttime, finishtime, value='relativeheight'):
         try:
             idstation = idstation
             starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
@@ -305,6 +305,33 @@ class TempSeriesPerTime(generics.GenericAPIView):
             return Response({'results': response_data})
         except Exception as e:
             return Response({'error': str(e)})
+        
+class TempSeriesPerTimeType(generics.GenericAPIView):
+    """
+    Sericio que recopila Series Temporales locales ,respondiendo a un intervalo de tiempo con un formato especifico
+    """
+    queryset = []  # Define una consulta ficticia
+
+    def get(self, request, idstation, starttime, finishtime, eventtype , value='relativeheight'):
+        try:
+            idstation = idstation
+            starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
+            finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
+            #lapsemin = int(lapsemin)
+            #starttime = starttime - timedelta(hours=6)
+            TSs_within_interval = Temporaryseries.objects.filter(statetempser=1).filter(
+                Q(idstation=idstation),
+                Q(ideventtype=eventtype),
+                starttimetempser__gte=starttime,
+                starttimetempser__lte=finishtime
+            )
+            serializer = TemporaryseriesSerializer(TSs_within_interval, many=True)
+            response_data = [{'starttimetempser': item['starttimetempser'], 'value': item[value], 'durationtempser' : item['durationtempser'], 'type' : item['ideventtype']} for item in serializer.data]
+
+            return Response({'results': response_data})
+        except Exception as e:
+            return Response({'error': str(e)})
+        
 from rest_framework.pagination import PageNumberPagination      
 class TempSeriesCompletePerTime(generics.ListAPIView):
     """
@@ -341,7 +368,7 @@ class TempSeriesOBSPerTime(generics.GenericAPIView):
     Sericio que selecciona las Series Temporales recopiladas por OBSPY ,respondiendo a un intervalo de tiempo con un formato especifico
     """
     queryset = [] 
-    def get(self, request, idstation, starttime, finishtime , value='waveskewnesstempser'):
+    def get(self, request, idstation, starttime, finishtime , value='relativeHeight'):
         try:
             #starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
             #finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
@@ -384,7 +411,7 @@ class TempSeriesOBSCantPerTime(generics.GenericAPIView):
     Sericio que selecciona las Series Temporales recopiladas por OBSPY ,respondiendo a un intervalo de tiempo con un formato especifico
     """
     queryset = [] 
-    def get(self, request, idstation, starttime, finishtime, cantidad , value='waveskewnesstempser'):
+    def get(self, request, idstation, starttime, finishtime, cantidad , value='relativeHeight'):
         try:
             segmento =  100 // cantidad
             #starttime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%S.%f')
@@ -849,7 +876,41 @@ class TemporaryseriesViewSet(ModelViewSet):
     """
     queryset = Temporaryseries.objects.order_by('pk')
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
+    search_fields = ['idstation__longnamevol','starttimetempser','idstation__shortnamestat']
+    filterset_fields = {
+        'idstation': ['exact'],#, 'icontains'
+        'starttimetempser': ['exact', 'gte', 'lte', 'date'], # Permitir búsqueda exacta, mayor que, menor que, y por fecha
+        'idstation__shortnamestat': ['exact', 'icontains'],
+    }
     serializer_class = TemporaryseriesSerializer
+
+class ExplosionViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Series Temporales
+    """
+    queryset = Explosion.objects.order_by('pk')
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
+    search_fields = ['idstation__longnamevol','starttimetempser','idstation__shortnamestat']
+    filterset_fields = {
+        'idstation': ['exact'],#, 'icontains'
+        'starttime': ['exact', 'gte', 'lte', 'date'], # Permitir búsqueda exacta, mayor que, menor que, y por fecha
+        'idstation__shortnamestat': ['exact', 'icontains'],
+    }
+    serializer_class = ExplosionSerializer
+class AlarmViewSet(ModelViewSet):
+    """
+    Sericio CRUD de Series Temporales
+    """
+    queryset = Alarm.objects.order_by('pk')
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
+    '''search_fields = ['idstation__longnamevol','starttimetempser','idstation__shortnamestat']
+    filterset_fields = {
+        'idStation': ['exact'],#, 'icontains'
+        'startTime ': ['exact', 'gte', 'lte', 'date'], # Permitir búsqueda exacta, mayor que, menor que, y por fecha
+        'idstation__shortnamestat': ['exact', 'icontains'],
+    }'''
+    serializer_class = AlarmSerializer
+
 class MappingViewSet(ModelViewSet):
     """
     Sericio CRUD de Mapeo para los atributos de las tablas

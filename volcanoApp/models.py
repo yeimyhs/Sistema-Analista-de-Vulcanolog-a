@@ -17,6 +17,22 @@ from django.utils import timezone
     idashdispersion
     idashfallprediction
     '''
+
+class Alarm(models.Model):
+    idalarm = models.CharField(db_column='idAlarm', max_length=17, primary_key=True, blank=True)  # Field name made lowercase.
+    starttime = models.DateTimeField(db_column='startTime')  # Field name made lowercase.
+    alarmtype = models.CharField(db_column='alarmType', max_length=2)  # Field name made lowercase.
+    sent = models.CharField(max_length=2)
+    idexplosion = models.CharField(db_column='idExplosion', max_length=17)  # Field name made lowercase.
+    idvolcano = models.CharField(db_column='idVolcano', max_length=3)  # Field name made lowercase.
+    ind = models.CharField(max_length=2, blank=True, null=True)
+    idstation = models.CharField(db_column='idStation', max_length=4, blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        db_table = 'Alarm'
+
+
+
 class Alert(models.Model):
     messagealert = models.TextField(db_column='messageAlert', blank = True)  # Field name made lowercase.
     idalert = models.CharField(max_length=24,db_column='idAlert', primary_key=True, blank= True) # Field name made lowercase.
@@ -119,6 +135,29 @@ class Eventtype(models.Model):
             self.ideventtype = self.generate_default_ideventtype()
         super().save(*args, **kwargs)
 
+
+class Explosion(models.Model):
+    idexplosion = models.CharField(db_column='idExplosion', max_length=17, primary_key=True, blank=True)  # Field name made lowercase.
+    starttime = models.DateTimeField(db_column='startTime')  # Field name made lowercase.
+    ideventtype = models.ForeignKey(Eventtype, models.DO_NOTHING,db_column='idEvent', blank=True, null=True)  # Field name made lowercase.
+    #idevent = models.CharField(db_column='idEvent', max_length=21)  # Field name made lowercase.
+    idimage = models.ForeignKey('Imagesegmentation', models.DO_NOTHING, db_column='idImage')  # Field name made lowercase.
+    #idimage = models.CharField(db_column='idImage', max_length=21, blank=True, null=True)  # Field name made lowercase.
+    idmask = models.CharField(db_column='idMask', max_length=21, blank=True, null=True)  # Field name made lowercase.
+    height = models.FloatField(blank=True, null=True)
+    ashdirection = models.CharField(db_column='ashDirection', max_length=30, blank=True, null=True)  # Field name made lowercase.
+    idwinddir = models.CharField(db_column='idWinddir', max_length=19, blank=True, null=True)  # Field name made lowercase.
+    idashdispersion = models.CharField(db_column='idAshDispersion', max_length=17, blank=True, null=True)  # Field name made lowercase.
+    idashfallprediction = models.ForeignKey('Ashfallprediction', models.DO_NOTHING, blank=True, null=True,db_column='idAshfallprediction')  # Field name made lowercase.
+    detectionmode = models.CharField(db_column='detectionMode', max_length=2)  # Field name made lowercase.
+    idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano', blank=True, null=True)  # Field name made lowercase.
+    #idvolcano = models.CharField(db_column='idVolcano', max_length=3)  # Field name made lowercase.
+    ind = models.CharField(max_length=2, blank=True, null=True)
+    #idstation = models.CharField(db_column='idStation', max_length=4)  # Field name made lowercase.
+    idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
+
+    class Meta:
+        db_table = 'Explosion'
 
 class History(models.Model):
     idhistory = models.BigAutoField(db_column='idHistory', primary_key=True)  # Field name made lowercase.
@@ -285,49 +324,42 @@ class Station(models.Model):
         super().save(*args, **kwargs)
 
 class Temporaryseries(models.Model): #SABSABA20230820202649
-    idtemporaryseries = models.CharField(max_length=21,db_column='idTemporarySeries', primary_key=True, blank=True)  # Field name made lowercase.
-    #idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano')  # Field name made lowercase.
-    idstation = models.ForeignKey(Station, on_delete=models.CASCADE, db_column='idStation')  # Field name made lowercase.
-    ideventtype = models.ForeignKey(Eventtype, models.CASCADE, db_column='idEventType',default="00")  # No se identifica Field name made lowercase.
-    meantempser = models.FloatField(db_column='meanTempSer')  # Field name made lowercase.
-    variancetempser = models.FloatField(db_column='varianceTempSer')  # Field name made lowercase.
-    standarddeviationtempser = models.FloatField(db_column='standardDeviationTempSer')  # Field name made lowercase.
-    mediantempser = models.FloatField(db_column='medianTempSer')  # Field name made lowercase.
-    maxvaluetempser = models.FloatField(db_column='maxValueTempSer')  # Field name made lowercase.
-    rmsvaluetempser = models.FloatField(db_column='rmsValueTempSer')  # Field name made lowercase.
-    energytempser = models.FloatField(db_column='energyTempSer')  # Field name made lowercase.
-    maxenergyintervaltempser = models.FloatField(db_column='maxEnergyIntervalTempSer')  # Field name made lowercase.
-    shannonentropytempser = models.FloatField(db_column='shannonEntropyTempSer')  # Field name made lowercase.
+    idtemporaryseries  = models.CharField(max_length=21, primary_key=True, db_column='idTemporarySeries', blank=True)
+    idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
+    ideventtype = models.ForeignKey(Eventtype, models.DO_NOTHING,db_column='idEventType', max_length=3, blank=True, null=True)  # Field name made lowercase.
     durationtempser = models.FloatField(db_column='durationTempSer')  # Field name made lowercase.
-    wavecontrasttempser = models.FloatField(db_column='waveContrastTempSer')  # Field name made lowercase.
-    wavekurtosistempser = models.FloatField(db_column='waveKurtosisTempSer')  # Field name made lowercase.
-    waveskewnesstempser = models.FloatField(db_column='waveSkewnessTempSer')  # Field name made lowercase.
-    envelopecontrasttempser = models.FloatField(db_column='envelopeContrastTempSer')  # Field name made lowercase.
-    envelopekurtosistempser = models.FloatField(db_column='envelopeKurtosisTempSer')  # Field name made lowercase.
-    envelopeskewnesstempser = models.FloatField(db_column='envelopeSkewnessTempSer')  # Field name made lowercase.
-    band01envelopeenergytempser = models.FloatField(db_column='band01EnvelopeEnergyTempSer')  # Field name made lowercase.
-    band02envelopeenergytempser = models.FloatField(db_column='band02EnvelopeEnergyTempSer')  # Field name made lowercase.
-    band03envelopeenergytempser = models.FloatField(db_column='band03EnvelopeEnergyTempSer')  # Field name made lowercase.
-    band04envelopeenergytempser = models.FloatField(db_column='band04EnvelopeEnergyTempSer')  # Field name made lowercase.
-    band05envelopeenergytempser = models.FloatField(db_column='band05EnvelopeEnergyTempSer')  # Field name made lowercase.
-    band01envelopekurtosistempser = models.FloatField(db_column='band01EnvelopeKurtosisTempSer')  # Field name made lowercase.
-    band02envelopekurtosistempser = models.FloatField(db_column='band02EnvelopeKurtosisTempSer')  # Field name made lowercase.
-    band03envelopekurtosistempser = models.FloatField(db_column='band03EnvelopeKurtosisTempSer')  # Field name made lowercase.
-    band04envelopekurtosistempser = models.FloatField(db_column='band04EnvelopeKurtosisTempSer')  # Field name made lowercase.
-    band05envelopekurtosistempser = models.FloatField(db_column='band05EnvelopeKurtosisTempSer')  # Field name made lowercase.
-    melc1tempser = models.FloatField(db_column='melC1TempSer')  # Field name made lowercase.
-    melc2tempser = models.FloatField(db_column='melC2TempSer')  # Field name made lowercase.
-    melc3tempser = models.FloatField(db_column='melC3TempSer')  # Field name made lowercase.
-    melc4tempser = models.FloatField(db_column='melC4TempSer')  # Field name made lowercase.
-    frequencyindextempser = models.FloatField(db_column='frequencyIndexTempSer')  # Field name made lowercase.
-    frequencyratiotempser = models.FloatField(db_column='frequencyRatioTempSer')  # Field name made lowercase.
-    minfrequencytempser = models.FloatField(db_column='minFrequencyTempSer')  # Field name made lowercase.
-    powerspectrumkurtosistempser = models.FloatField(db_column='powerSpectrumKurtosisTempSer')  # Field name made lowercase.
-    powerspectrumskewnesstempser = models.FloatField(db_column='powerSpectrumSkewnessTempSer')  # Field name made lowercase.
+    energytempser = models.FloatField(db_column='energyTempSer')  # Field name made lowercase.
+    freqindextempser = models.FloatField(db_column='freqIndexTempSer')  # Field name made lowercase.
+    attackratiotempser = models.FloatField(db_column='attackRatioTempSer')  # Field name made lowercase.
+    decayratiotempser = models.FloatField(db_column='decayRatioTempSer')  # Field name made lowercase.
+    meantempser = models.FloatField(db_column='meanTempSer')  # Field name made lowercase.
+    standarddeviationtempser = models.FloatField(db_column='standardDeviationTempSer')  # Field name made lowercase.
+    skewnesstempser = models.FloatField(db_column='skewnessTempSer')  # Field name made lowercase.
+    kurtosistempser = models.FloatField(db_column='kurtosisTempSer')  # Field name made lowercase.
+    centralenergytempser = models.FloatField(db_column='centralEnergyTempSer')  # Field name made lowercase.
+    rmsbandwidthtempser = models.FloatField(db_column='rmsBandwidthTempSer')  # Field name made lowercase.
+    meanskewnesstempser = models.FloatField(db_column='meanSkewnessTempSer')  # Field name made lowercase.
+    meankurtosistempser = models.FloatField(db_column='meanKurtosisTempSer')  # Field name made lowercase.
+    entropytempser = models.FloatField(db_column='entropyTempSer')  # Field name made lowercase.
+    brightnesstempser = models.FloatField(db_column='brightnessTempSer')  # Field name made lowercase.
+    shannonentropytempser = models.FloatField(db_column='shannonEntropyTempSer')  # Field name made lowercase.
+    renyientropytempser = models.FloatField(db_column='renyiEntropyTempSer')  # Field name made lowercase.
+    lpc1tempser = models.FloatField(db_column='lpc1TempSer')  # Field name made lowercase.
+    lpc2tempser = models.FloatField(db_column='lpc2TempSer')  # Field name made lowercase.
+    lpc3tempser = models.FloatField(db_column='lpc3TempSer')  # Field name made lowercase.
+    lpc4tempser = models.FloatField(db_column='lpc4TempSer')  # Field name made lowercase.
+    lpc5tempser = models.FloatField(db_column='lpc5TempSer')  # Field name made lowercase.
+    cc1tempser = models.FloatField(db_column='cc1TempSer')  # Field name made lowercase.
+    cc2tempser = models.FloatField(db_column='cc2TempSer')  # Field name made lowercase.
+    cc3tempser = models.FloatField(db_column='cc3TempSer')  # Field name made lowercase.
+    cc4tempser = models.FloatField(db_column='cc4TempSer')  # Field name made lowercase.
+    cc5tempser = models.FloatField(db_column='cc5TempSer')  # Field name made lowercase.
     starttimetempser = models.DateTimeField(db_column='startTimeTempSer')  # Field name made lowercase.
-    datecreationtempser = models.DateTimeField(db_column='dateCreationTempSer',auto_now_add=True)  # Field name made lowercase.
+    datecreationtempser = models.DateTimeField(db_column='dateCreationTempSer')  # Field name made lowercase.
     statetempser = models.SmallIntegerField(db_column='stateTempSer')  # Field name made lowercase.
-    indtempser = models.IntegerField(db_column='indTempSer', null=True)  # Field name made lowercase.
+    indtempser = models.IntegerField(db_column='indTempSer', blank=True, null=True)  # Field name made lowercase.
+    relativeheight = models.CharField(db_column='relativeHeight', blank=True, null=True)  # Field name made lowercase.
+
     def generate_default_idtemporaryseries(self):
         now = timezone.now()
         date_time = now.strftime('%Y%m%d%H%M%S')

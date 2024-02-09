@@ -83,6 +83,8 @@ urlpatterns = [
         views.TempSeriesCompletePerTime.as_view(),
         name="TempSeriesCompletePerTime"
     ),
+
+   path('tempseriespertimetype/<str:idstation>/<str:eventtype>/<str:value>/<str:starttime>/<str:finishtime>', views.TempSeriesPerTimeType.as_view(), name='temp-series-per-time'),
    path("tempseriespertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.TempSeriesPerTime.as_view(), name="TempSeriesPerTime"),
    path("tempseriesobspertime/<str:idstation>/<str:starttime>/<str:finishtime>", views.TempSeriesOBSPerTime.as_view(), name="TempSeriesOBSPerTime"),
    path("tempseriesobscantpertime/<str:idstation>/<int:cantidad>/<str:starttime>/<str:finishtime>", views.TempSeriesOBSCantPerTime.as_view(), name="TempSeriesOBSPerTime"),
@@ -111,6 +113,8 @@ urlpatterns = [
 router = SimpleRouter()
 
 router.register(r'alert', views.AlertViewSet)
+router.register(r'alarm', views.AlarmViewSet)
+router.register(r'explosion', views.ExplosionViewSet)
 router.register(r'alertconfiguration', views.AlertconfigurationViewSet)
 router.register(r'blob', views.BlobViewSet)
 router.register(r'eventtype', views.EventtypeViewSet)
