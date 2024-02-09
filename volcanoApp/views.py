@@ -623,13 +623,19 @@ class AlertViewSet(ModelViewSet):
     queryset = Alert.objects.order_by('pk')
     serializer_class = AlertSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter,filters.SearchFilter]
-    filterset_class = volcanoApp.filters.AlertFilter
+    #filterset_class = volcanoApp.filters.AlertFilter
     search_fields = ['idalert',
                   'idvolcano__longnamevol',
                   'idvolcano__shortnamevol', 
                   'idvolcano__descriptionvol' ,
                      'messagealert'
                   ] 
+    filterset_fields = {
+        'idvolcano': ['exact'],#, 'icontains'
+        'idstation': ['exact'],#, 'icontains'
+        'datecreationalert': ['exact', 'gte', 'lte', 'date'], # Permitir búsqueda exacta, mayor que, menor que, y por fecha
+        'idstation__shortnamestat': ['exact', 'icontains'],
+    }
 
 '''    pagination_class = CustomPagination 
 
