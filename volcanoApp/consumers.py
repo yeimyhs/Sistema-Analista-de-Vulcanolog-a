@@ -163,36 +163,56 @@ import json
 from asyncio import sleep
 from obspy import Stream, Trace
 
+
+from obspy.clients.earthworm import Client
+from obspy import UTCDateTime
+import time
+
 class realtimeSTobspy(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
         self.cantidad = int(self.scope['url_route']['kwargs']['cantidad']) - 1
         self.segmento = 100 // self.cantidad
 
-        self.earthworm_ip = '10.0.20.55'
-        self.earthworm_port = 16025
-        self.network = 'PE'
-        self.station = 'SAB'
-        self.location = ''
-        self.channel = 'BH?'
+        earthworm_ip = "10.0.20.55"
+        earthworm_port = 16025
+
+        # Configura el nombre de la estación y las componentes del canal
+        network = "PE"
+        station = "SAB"
+        location = ""
+        channel = "BH?"
+
+        # Configura la tasa de muestreo y el intervalo de tiempo
+        samplerate = 10.0
+        duration = 60  # Duración en segundos para obtener datos en tiempo real
+
+        # Crea el cliente Earthworm
+        client = Client(earthworm_ip, earthworm_port)
+        t=1
+
+        current_time = UTCDateTime() - 12
 
         await self.send_data_in_real_time()
 
     async def send_data_in_real_time(self):
+        current_time = self.current_time
+        
+
+
         while True:
-            current_time = UTCDateTime()
-            start_time = current_time - 8
-            end_time = current_time - 7
+            start_time = current_time
+            current_time = self.current_time+1
 
             try:
-                client = Client(self.earthworm_ip, self.earthworm_port)
-                st = client.get_waveforms(self.network, self.station, self.location, self.channel, start_time, end_time)
+                st = self.client.get_waveforms(self.network, self.station, self.location, self.channel, start_time, (start_time+self.t))
 
                 if st:
                     trace = st[0]
-                    trace.decimate(self.segmento, strict_length=False, no_filter=True)
+                    trace.decimate(self.segmento, strict_length=False, no_filter=True )
                     values = trace.data
                     times = trace.times()
+
 
                     result = [
                         {"time": str(UTCDateTime(start_time + time)), "value": int(value)} for time, value in zip(times, values)
@@ -200,10 +220,7 @@ class realtimeSTobspy(AsyncWebsocketConsumer):
 
                     for entry in result:
                         await self.send(text_data=json.dumps(entry))
-                        print(entry)
-                        await sleep(0.00001)
-
-                    print("------------------------")
+                        
                     await sleep(1)
                 else:
                     await sleep(1)
@@ -213,3 +230,9 @@ class realtimeSTobspy(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         await super().disconnect(code=close_code)
+
+
+#print(entry)
+                        #await sleep(0.00001)
+
+                    #print("------------------------")
