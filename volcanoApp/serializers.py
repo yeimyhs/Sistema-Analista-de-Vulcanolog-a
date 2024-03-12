@@ -440,6 +440,7 @@ class ReadOnlyExplosionSerializer(ModelSerializer):
         except ObjectDoesNotExist:
             representation['idstation_details'] = None
 
+        
         return representation
 
 class ExplosionwithoutdetaiilsSerializer(serializers.ModelSerializer):
