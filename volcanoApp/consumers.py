@@ -174,24 +174,24 @@ class realtimeSTobspy(AsyncWebsocketConsumer):
         self.cantidad = int(self.scope['url_route']['kwargs']['cantidad']) - 1
         self.segmento = 100 // self.cantidad
 
-        earthworm_ip = "10.0.20.55"
-        earthworm_port = 16025
+        earthworm_ip = "10.0.160.50"
+        earthworm_port = 16123
 
         # Configura el nombre de la estación y las componentes del canal
-        network = "PE"
-        station = "SAB"
-        location = ""
-        channel = "BH?"
+        self.network = "PE"
+        self.station = "SAB"
+        self.location = ""
+        self.channel = "BH?"
 
         # Configura la tasa de muestreo y el intervalo de tiempo
-        samplerate = 10.0
-        duration = 60  # Duración en segundos para obtener datos en tiempo real
+        self.samplerate = 10.0
+        self.duration = 60  # Duración en segundos para obtener datos en tiempo real
 
         # Crea el cliente Earthworm
-        client = Client(earthworm_ip, earthworm_port)
-        t=1
+        self.client = Client(earthworm_ip, earthworm_port)
+        self.t=1
 
-        current_time = UTCDateTime() - 12
+        self.current_time = UTCDateTime() - 15
 
         await self.send_data_in_real_time()
 
@@ -202,7 +202,7 @@ class realtimeSTobspy(AsyncWebsocketConsumer):
 
         while True:
             start_time = current_time
-            current_time = self.current_time+1
+            current_time = current_time+1
 
             try:
                 st = self.client.get_waveforms(self.network, self.station, self.location, self.channel, start_time, (start_time+self.t))
@@ -236,3 +236,55 @@ class realtimeSTobspy(AsyncWebsocketConsumer):
                         #await sleep(0.00001)
 
                     #print("------------------------")
+
+
+
+class realtimeSTobspy2(AsyncWebsocketConsumer):
+    async def connect(self):
+        await self.accept()
+        self.cantidad = int(self.scope['url_route']['kwargs']['cantidad']) - 1
+        self.segmento = 100 // self.cantidad
+        self.earthworm_ip = "10.0.160.50"
+        self.earthworm_port = 16123
+        self.network = 'PE'
+        self.station = 'SAB'
+        self.location = ''
+        self.channel = 'BH?'
+
+        await self.send_data_in_real_time()
+
+    async def send_data_in_real_time(self):
+        while True:
+            current_time = UTCDateTime()
+            start_time = current_time - 8
+            end_time = current_time - 7
+
+            try:
+                client = Client(self.earthworm_ip, self.earthworm_port)
+                st = client.get_waveforms(self.network, self.station, self.location, self.channel, start_time, end_time)
+
+                if st:
+                    trace = st[0]
+                    trace.decimate(self.segmento, strict_length=False, no_filter=True)
+                    values = trace.data
+                    times = trace.times()
+
+                    result = [
+                        {"time": str(UTCDateTime(start_time + time)), "value": int(value)} for time, value in zip(times, values)
+                    ]
+
+                    for entry in result:
+                        await self.send(text_data=json.dumps(entry))
+                        print(entry)
+                        await sleep(0.00001)
+
+                    print("------------------------")
+                    await sleep(1)
+                else:
+                    await sleep(1)
+            except Exception as e:
+                print(f"Error: {str(e)}")
+                await sleep(1)
+
+    async def disconnect(self, close_code):
+        await super().disconnect(code=close_code)

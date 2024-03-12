@@ -321,7 +321,8 @@ class MaskSerializer(ModelSerializer):
                         url = f"https://api.telegram.org/bot{settings.TELEGRAM_TOKEN}/sendMessage?chat_id={settings.TELEGRAM_CHANNEL_CHAT_ID}&text={message}"
                         phone_numbers = list(UserP.objects.values_list('phone', flat=True))
 
-                    #print(requests.get(url).json())
+                    #print(
+                        requests.get(url).json()#)
                     # Guardar la nueva alerta en la base de datos
                     '''
                     # lista de todos los numeros
@@ -397,12 +398,12 @@ class ReadOnlyExplosionSerializer(ModelSerializer):
         except ObjectDoesNotExist:
             representation['idimage_details'] = None
         
-        try:
+        '''try:
             idmask_details = instance.idmask
             if idmask_details:
                 representation['idmask_details'] = MaskSerializer(idmask_details).data
         except ObjectDoesNotExist:
-            representation['idmask_details'] = None
+            representation['idmask_details'] = None'''
         
         try:
             idwinddir_details = instance.idwinddir
@@ -463,12 +464,6 @@ class ExplosionSerializer(serializers.ModelSerializer):
             except ObjectDoesNotExist:
                 representation['idimage_details'] = None
             
-            try:
-                idmask_details = instance.idmask
-                if idmask_details:
-                    representation['idmask_details'] = MaskSerializer(idmask_details).data
-            except ObjectDoesNotExist:
-                representation['idmask_details'] = None
             
             try:
                 idwinddir_details = instance.idwinddir

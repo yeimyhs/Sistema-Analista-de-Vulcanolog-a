@@ -146,7 +146,7 @@ class Explosion(models.Model):
     #idevent = models.CharField(db_column='idEvent', max_length=21)  # Field name made lowercase.
     idimage = models.ForeignKey('Imagesegmentation', models.DO_NOTHING, db_column='idImage', blank=True, null=True)  # Field name made lowercase.
     #idimage = models.CharField(db_column='idImage', max_length=21, blank=True, null=True)  # Field name made lowercase.
-    idmask = models.ForeignKey('Mask', on_delete=models.DO_NOTHING, db_column='idMask', blank=True, null=True)  # Field name made lowercase.
+    #idmask = models.ForeignKey('Mask', on_delete=models.DO_NOTHING, db_column='idMask', blank=True, null=True)  # Field name made lowercase.
     #idmask = models.CharField(db_column='idMask', max_length=21, blank=True, null=True)  # Field name made lowercase.
     height = models.FloatField(blank=True, null=True)
     #ashdirection = models.ForeignKey('Ashfallprediction', models.DO_NOTHING,db_column='ashDirection', blank=True, null=True)  # Field name made lowercase.
@@ -163,7 +163,7 @@ class Explosion(models.Model):
     ind = models.CharField(max_length=2, blank=True, null=True)
     #idstation = models.CharField(db_column='idStation', max_length=4)  # Field name made lowercase.
     idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation', blank=True, null=True)  # Field name made lowercase.
-
+    data = models.JSONField(blank=True, null=True)
     class Meta:
         db_table = 'Explosion'
 
