@@ -389,22 +389,23 @@ class ReadOnlyExplosionSerializer(ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-
-        # Obtener los detalles de los modelos relacionados y agregarlos a la representación
+        image_segmentation = instance.idimage
+            # Obtener los detalles de los modelos relacionados y agregarlos a la representación
         try:
-            if instance.idimage is not None:
-                idimage_details = instance.idimage
-                representation['idimage_details'] = ImagesegmentationSerializer(idimage_details).data
+                if image_segmentation is not None:
+                    # Obtener los detalles de la imagen
+                    idimage_details = instance.idimage
+                    representation['idimage_details'] = ImagesegmentationSerializer(idimage_details).data
         except ObjectDoesNotExist:
             representation['idimage_details'] = None
-        
-        '''try:
-            idmask_details = instance.idmask
-            if idmask_details:
-                representation['idmask_details'] = MaskSerializer(idmask_details).data
+            
+        try:
+            if image_segmentation is not None:
+                mask_details = Mask.objects.get(idmask=image_segmentation)
+                representation['mask_details'] = MaskSerializer(mask_details).data
         except ObjectDoesNotExist:
-            representation['idmask_details'] = None'''
-        
+            representation['mask_details'] = None
+
         try:
             idwinddir_details = instance.idwinddir
             if idwinddir_details:
@@ -455,17 +456,24 @@ class ExplosionSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-
         if self.context['request'].method in ['GET', 'LIST']:
+            image_segmentation = instance.idimage
             # Obtener los detalles de los modelos relacionados y agregarlos a la representación
             try:
-                if instance.idimage is not None:
-                    idimage_details = instance.idimage
-                    representation['idimage_details'] = ImagesegmentationSerializer(idimage_details).data
+                    if image_segmentation is not None:
+                        # Obtener los detalles de la imagen
+                        idimage_details = instance.idimage
+                        representation['idimage_details'] = ImagesegmentationSerializer(idimage_details).data
             except ObjectDoesNotExist:
                 representation['idimage_details'] = None
-            
-            
+                
+            try:
+                if image_segmentation is not None:
+                    mask_details = Mask.objects.get(idmask=image_segmentation)
+                    representation['mask_details'] = MaskSerializer(mask_details).data
+            except ObjectDoesNotExist:
+                representation['mask_details'] = None
+
             try:
                 idwinddir_details = instance.idwinddir
                 if idwinddir_details:
