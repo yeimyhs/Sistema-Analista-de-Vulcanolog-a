@@ -213,12 +213,13 @@ class AshdispersionPertTime(generics.GenericAPIView):
             finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             #lapsemin = int(lapsemin)
             #starttime = starttime - timedelta(hours=6)
-            #noticeash= Ashdispersion.objects.order_by('starttimeashdisp').first().idnoticeashdisp
-
-            ADs_within_interval = Ashdispersion.objects.filter(
+            noticeash= Ashdispersion.objects.filter(
                 Q(idvolcano=idvolcano),
                 starttimeashdisp__gte=starttime,
                 starttimeashdisp__lte=finishtime
+            ).order_by('starttimeashdisp').first().idnoticeashdisp
+
+            ADs_within_interval = Ashdispersion.objects.filter(Q(idnoticeashdisp=noticeash)
             ).order_by('starttimeashdisp')
             serializer = AshdispersionSerializer(ADs_within_interval, many=True)
             response_data = [{'starttime': item['starttimeashdisp'], 'value': item[value], 'idnoticeashdisp':item['idnoticeashdisp'], 'idtypeashdisp':item['idtypeashdisp'] } for item in serializer.data]
