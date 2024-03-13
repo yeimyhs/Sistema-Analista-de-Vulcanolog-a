@@ -43,7 +43,7 @@ class Alert(models.Model):
     statealert = models.IntegerField(db_column='stateAlert')  # Field name made lowercase.
     idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano')  # Field name made lowercase.
     idalertconf = models.ForeignKey('Alertconfiguration', on_delete=models.CASCADE, db_column='idAlertConf')  # Field name made lowercase.
-    startalert = models.SmallIntegerField(db_column='startAlert', blank=True, null=True)  # Field name made lowercase.
+    #startalert = models.SmallIntegerField(db_column='startAlert', blank=True, null=True)  # Field name made lowercase.
     
     longitudealert = models.FloatField(db_column='longitudeAlert', blank=True, null=True)  # Field name made lowercase.
     latitudealert = models.FloatField(db_column='latitudeAlert', blank=True, null=True)  # Field name made lowercase.
@@ -54,7 +54,7 @@ class Alert(models.Model):
     idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
     alertlevelalert  =models.CharField(max_length=10,db_column='alertLevelAlert')#copiar de volcan
 
-    idimgraw = models.ForeignKey('Imagesegmentation', models.DO_NOTHING, db_column='idPhoto')  # Field name made lowercase.
+    idimgraw = models.ForeignKey('Imagesegmentation', models.DO_NOTHING, db_column='idPhoto', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         db_table = 'Alert'
@@ -75,7 +75,8 @@ class Alertconfiguration(models.Model):
     altitudalertconf = models.FloatField(db_column='altitudAlertConf')  # Field name made lowercase.
     statealertconf = models.IntegerField(db_column='stateAlertConf')  # Field name made lowercase.
     datecreationalertconf = models.DateTimeField(db_column='dateCreationAlertConf',auto_now_add=True)  # Field name made lowercase.
-    idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano', blank=True, null=True)  # Field name made lowercase.
+    #idvolcano = models.ForeignKey('Volcano', models.DO_NOTHING, db_column='idVolcano', blank=True, null=True)  # Field name made lowercase.
+    idvolcano = models.OneToOneField('Volcano', on_delete=models.CASCADE, db_column='idVolcano', related_name='alert_configuration', blank=True, null=True)
     notificationalertconf = models.BigIntegerField(db_column='notificationAlertConf', blank=True, null=True)  # Field name made lowercase.
     messagetemplateconfalert = models.TextField(db_column='messageTemplateConfAlert', blank=True, null=True)  # Field name made lowercase.
     mensajeriaalertconf = models.SmallIntegerField(db_column='mensajeriaAlertConf', blank=True, null=True)  # Field name made lowercase.
