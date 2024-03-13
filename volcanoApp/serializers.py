@@ -294,7 +294,8 @@ class MaskSerializer(ModelSerializer):
     class Meta:
         model = Mask
         fields = '__all__'
-    @transaction.atomic
+
+'''    @transaction.atomic
     def save(self, *args, **kwargs):
         # Realizar el condicional aquí
         super().save(*args, **kwargs)
@@ -324,16 +325,16 @@ class MaskSerializer(ModelSerializer):
                     #print(
                         requests.get(url).json()#)
                     # Guardar la nueva alerta en la base de datos
-                    '''
+                    # '/''
                     # lista de todos los numeros
                     message = client.mess ages.create(
                         from_='whatsapp:+14155238886',
                         body=alertconf.messagetemplateconfalert,
                         to=['whatsapp:+51973584851']
                         )
-                    '''
+                    #''/'
                     #########send_sms_messages(phone_numbers,alertconf.messagetemplateconfalert)
-                    nueva_alerta.save()
+                    nueva_alerta.save()'''
 
 
 
@@ -531,3 +532,8 @@ class AlarmSerializer(ModelSerializer):
                 representation['idexplosion_details'] = None
 
         return representation
+    
+class AlarmPushSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Alarm
+        fields = '__all__'
