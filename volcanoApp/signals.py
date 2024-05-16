@@ -33,7 +33,8 @@ def enviar_notificacion(sender, instance, **kwargs):
             group_name,
             {
                 "type": "send.notification_from_server",  # Tipo de mensaje definido en el consumidor
-                "message": message_from_server 
+                "message": message_from_server,
+                "notif":"alert"
             }
         )
 
@@ -123,6 +124,7 @@ def enviar_notificacion_alarma(sender, instance, **kwargs):
         group_name,
         {
             "type": "send.notification_from_server",  # Tipo de mensaje definido en el consumidor
-            "message": message_from_server
+            "message": message_from_server,
+            "notif":"alarm"
         }
     )
