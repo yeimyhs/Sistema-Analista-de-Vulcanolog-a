@@ -187,7 +187,7 @@ class Imagesegmentation(models.Model):
     idphoto = models.CharField(max_length=21, db_column='idPhoto', primary_key=True, blank=True)  # Field name made lowercase.
     urlimg = models.TextField(db_column='urlImg')  # Field name made lowercase.
     filenameimg = models.CharField(db_column='fileNameImg', max_length=128)  # Field name made lowercase.
-    stateimg = models.SmallIntegerField(db_column='stateImg')  # Field name made lowercase.
+    stateimg = models.SmallIntegerField(db_column='stateImg', null=False)  # Field name made lowercase.
     datecreationimg = models.DateTimeField(db_column='dateCreationImg',auto_now_add=True)  # Field name made lowercase.
     idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
 
@@ -214,7 +214,7 @@ class Mask(models.Model):#SABCAJA20230822020000
     filenamemask = models.TextField(db_column='fileNamemask')  # Field name made lowercase.
     directionmask = models.TextField(db_column='directionmask')  # Field name made lowercase.
     heighmask = models.FloatField(db_column='heighmask')  # Field name made lowercase.
-    statemask = models.SmallIntegerField(db_column='statemask')  # Field name made lowercase.
+    statemask = models.SmallIntegerField(db_column='statemask', null=False)  # Field name made lowercase.
     idstation = models.ForeignKey('Station', models.DO_NOTHING, db_column='idStation')  # Field name made lowercase.
 
     class Meta:
