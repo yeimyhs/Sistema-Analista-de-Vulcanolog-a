@@ -124,15 +124,11 @@ class CountingWebSocketConsumer(WebsocketConsumer):
 
 class notifpush(WebsocketConsumer):
     def connect(self):
-        print("---holi")
-        
         self.room_group_name = "canal_notif_alert"
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name, self.channel_name
         )
         self.accept()
-        print("---holi")
-
 
     def disconnect(self, close_code):
         async_to_sync(self.channel_layer.group_discard)(
@@ -151,9 +147,10 @@ class notifpush(WebsocketConsumer):
     # Método para manejar mensajes enviados desde otra parte de la aplicación
     def send_notification_from_server(self, event):
         message = event["message"]
+        notif = event["notif"]
         # Realizar acciones con el mensaje enviado desde otro lugar de la aplicación
         # Enviar el mensaje de vuelta a los clientes conectados
-        self.send(text_data=json.dumps({"message": message}))
+        self.send(text_data=json.dumps({"message": message, "notif": notif}))
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import AsyncWebsocketConsumer
