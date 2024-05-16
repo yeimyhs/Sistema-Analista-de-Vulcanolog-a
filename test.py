@@ -3,8 +3,8 @@ from obspy import UTCDateTime
 import time
 
 # Crear el cliente SeedLink con los detalles del servidor
-server_ip = '10.0.20.55'
-server_port = 16025
+server_ip = '10.0.160.50'
+server_port = 16123
 network = 'PE'
 station = 'SAB'
 location = ''
