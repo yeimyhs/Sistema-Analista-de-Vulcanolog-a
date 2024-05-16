@@ -4,6 +4,7 @@ import sys
 pip install python-gammu https://pypi.org/project/python-gammu/
 '''
 from rest_framework.serializers import ModelSerializer
+import json
 from volcanoApp.models import Alert, Alertconfiguration, Blob, Eventtype, History, Imagesegmentation, Mask, Station, Temporaryseries, Volcano\
 , UserP, Mapping, Ashdispersion, Ashfallprediction, Winddirection, Explosion, Alarm
 
@@ -450,6 +451,64 @@ class ExplosionwithoutdetaiilsSerializer(serializers.ModelSerializer):
         model = Explosion
         fields = '__all__'
 
+
+class Explosionmask_imagedetaiilsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Explosion
+        fields = ['idexplosion', 'starttime', 'ideventtype', 'idimage', 'height', 'detectionmode', 'idstation', 'data']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        image_segmentation = instance.idimage
+
+        # Obtener los detalles de la imagen si está presente
+        try:
+                if image_segmentation is not None:
+                    # Obtener los detalles de la imagen
+                    idimage_details = instance.idimage
+                    representation['idimage_details'] = ImagesegmentationSerializer(idimage_details).data
+        except ObjectDoesNotExist:
+            representation['idimage_details'] = None
+            
+
+        # Obtener los detalles de la máscara si está presente
+        if image_segmentation:
+            try:
+                mask_details = Mask.objects.get(idmask=image_segmentation)
+                representation['mask_details'] = MaskSerializer(mask_details).data
+            except Mask.DoesNotExist:
+                representation['mask_details'] = None
+
+        # Obtener los detalles de las estaciones desde los datos planos
+        data = representation.get('data')
+        image = data.get('image', [])
+        if data:
+            station_details = {}
+            for index, station_id in enumerate(data.get('station', [])):
+                station_data = {
+                    'station_details': station_id,
+                    'idimage_details': self.get_imagesegmentation_details(station_id),
+                    'mask_details': self.get_mask_details(station_id)
+                }
+                station_details[image[index]] = station_data
+
+            representation['data']['station_details'] = station_details
+
+        return representation
+
+    def get_imagesegmentation_details(self, idimage):
+        try:
+            return ImagesegmentationSerializer(Imagesegmentation.objects.get(idphoto=idimage)).data
+        except Imagesegmentation.DoesNotExist:
+            return None
+
+    def get_mask_details(self, idmask):
+        try:
+            return MaskSerializer(Mask.objects.get(idmask=idmask)).data
+        except Mask.DoesNotExist:
+            return None
+
+
 class ExplosionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Explosion
@@ -527,9 +586,19 @@ class AlarmSerializer(ModelSerializer):
             try:
                 if instance.idexplosion is not None:
                     idexplosion_details = instance.idexplosion
-                    representation['idexplosion_details'] = ExplosionwithoutdetaiilsSerializer(idexplosion_details).data
+                    representation['idexplosion_details'] = Explosionmask_imagedetaiilsSerializer(idexplosion_details).data
             except ObjectDoesNotExist:
                 representation['idexplosion_details'] = None
+
+
+            try:
+                if instance.idvolcano is not None:
+                    volcano_details = instance.idvolcano
+                    representation['volcano_details'] = VolcanoSerializer(volcano_details).data
+            except ObjectDoesNotExist:
+                representation['volcano_details'] = None
+
+          
 
         return representation
     
