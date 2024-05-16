@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ModelViewSet
 from volcanoApp.serializers import AlertSerializer, AlertconfigurationSerializer, BlobSerializer, EventtypeSerializer, HistorySerializer, ImagesegmentationSerializer, MaskSerializer, StationSerializer, TemporaryseriesSerializer, VolcanoSerializer \
-    , UserPSerializer ,MappingSerializer, AshdispersionSerializer, WinddirectionSerializer, AshfallpredictionSerializer , AlarmSerializer,ExplosionSerializer,ExplosionwithoutdetaiilsSerializer,ReadOnlyExplosionSerializer
+    , UserPSerializer ,MappingSerializer, AshdispersionSerializer, WinddirectionSerializer, AshfallpredictionSerializer , AlarmSerializer,ExplosionSerializer,ExplosionwithoutdetaiilsSerializer,ReadOnlyExplosionSerializer,Explosionmask_imagedetaiilsSerializer
 from volcanoApp.models import Alert, Alertconfiguration, Blob, Eventtype, History, Imagesegmentation, Mask, Station, Temporaryseries, Volcano \
     , UserP, Mapping, Ashdispersion, Ashfallprediction, Winddirection, Explosion,Alarm
 import volcanoApp.filters  
@@ -375,7 +375,7 @@ class TempSeriesOBSPerTime(generics.GenericAPIView):
             #finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             t1 = UTCDateTime(starttime)
             t2 = UTCDateTime(finishtime)
-            client = Client("10.0.20.55",16025)
+            client = Client("10.0.160.50",16123)
             st = client.get_waveforms("PE", idstation, "", "BH?", t1, t2)
 
             #lapsemin = int(lapsemin)
@@ -419,7 +419,7 @@ class TempSeriesOBSCantPerTime(generics.GenericAPIView):
             #finishtime = datetime.strptime(finishtime, '%Y-%m-%dT%H:%M:%S.%f')
             t1 = UTCDateTime(starttime)
             t2 = UTCDateTime(finishtime)
-            client = Client("10.0.20.55",16025)
+            client = Client("10.0.160.50",16123)
             st = client.get_waveforms("PE", idstation, "", "BH?", t1, t2)
 
             #lapsemin = int(lapsemin)
@@ -891,6 +891,8 @@ class TemporaryseriesViewSet(ModelViewSet):
     }
     serializer_class = TemporaryseriesSerializer
 
+from datetime import time
+
 class ExplosionViewSet(ModelViewSet):
     """
     Sericio CRUD de Explosion
@@ -907,40 +909,87 @@ class ExplosionViewSet(ModelViewSet):
     }
     serializer_class = ExplosionSerializer
     
+    def get_queryset(self):
+        queryset = Explosion.objects.order_by('pk')
+        start_time = time(10, 30)
+        end_time = time(23, 0)
+        queryset = queryset.filter(starttime__time__gte=start_time, starttime__time__lte=end_time)
+        return queryset
+    
     @action(detail=True, methods=['get'])
-    def filter_by_station_graphic(self, request, pk=None):
-        explosion = self.get_object()
+    def filter_by_station_graphic(self, request, **kwargs):
+        # Obtener la explosión enviada como parámetro, si está disponible
+        explosion = kwargs.get('explosion')
 
-        # Filtrar explosiones por estado detectionmode 'V'
-        explosions = Explosion.objects.filter(detectionmode='V')
+        # Si no se proporciona una explosión como parámetro, obtener la instancia actual
+        if not explosion:
+            explosion = self.get_object()
 
-        # Obtener el volcán de la explosión
-        volcano_id = explosion.idvolcano_id
+        # Verificar si se proporciona una explosión válida
+        if explosion:
+            # Filtrar explosiones por estado detectionmode 'V'
+            explosions = Explosion.objects.all()
 
-        # Filtrar estaciones gráficas del volcán de la explosión
-        graphic_stations = Station.objects.filter(idvolcano=volcano_id, typestat=2)
+            # Obtener el volcán de la explosión
+            volcano_id = explosion.idvolcano
 
-        # Inicializar el diccionario para almacenar las explosiones filtradas por estación gráfica
-        filtered_explosions_by_station = {}
+            # Filtrar estaciones gráficas del volcán de la explosión
+            graphic_stations = Station.objects.filter(idvolcano=volcano_id, typestat=2)
 
-        # Filtrar explosiones por starttime
-        for graphic_station in graphic_stations:
-            # Filtrar explosiones por estación gráfica y starttime
-            filtered_explosions = explosions.filter(idstation=graphic_station.idstation, starttime__gte=explosion.starttime).order_by('starttime')
+            # Inicializar el diccionario para almacenar las explosiones filtradas por estación gráfica
+            filtered_explosions_by_station = {}
 
-            # Obtener el índice del evento actual
-            following_events = list(filtered_explosions[:4])
+            # Filtrar explosiones por starttime
+            for graphic_station in graphic_stations:
+                # Filtrar la explosión anterior sin incluir la actual
+                previous_explosions = explosions.filter(idstation=graphic_station.idstation, starttime__lt=explosion.starttime).order_by('-starttime')[:1]
 
-            # Serializar las explosiones filtradas
-            serialized_explosions = ReadOnlyExplosionSerializer(following_events, many=True).data
+                # Filtrar las dos siguientes explosiones, incluida la actual   .exclude(pk=explosion.pk)
+                next_explosions = explosions.filter(idstation=graphic_station.idstation, starttime__gte=explosion.starttime).order_by('starttime')[:3]
 
-            # Almacenar los detalles de las explosiones por estación gráfica
-            filtered_explosions_by_station[graphic_station.idstation] = {
-                'explosions': serialized_explosions,
-                'starttime': explosion.starttime
-            }
+                # Combinar las explosiones anteriores y siguientes con la explosión actual
+                combined_explosions = list(previous_explosions) + list(next_explosions)
 
-        return Response(filtered_explosions_by_station)
+                # Serializar las explosiones filtradas
+                serialized_explosions = Explosionmask_imagedetaiilsSerializer(combined_explosions, many=True).data
+
+                # Almacenar los detalles de las explosiones por estación gráfica
+                filtered_explosions_by_station[graphic_station.idstation] = {
+                    'explosions': serialized_explosions,
+                    'starttime': explosion.starttime
+                }
+            return Response(filtered_explosions_by_station)
+        else:
+            return Response({'detail': 'No se proporcionó una explosión válida y no se encontró una instancia actual.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['get'])
+    def next_explosion_details(self, request, pk=None):
+        current_explosion = self.get_object()
+        explosions = Explosion.objects.all()
+
+        next_explosion = explosions.filter(starttime__gt=current_explosion.starttime).order_by('starttime').first()
+
+        if next_explosion:
+            # Obtener detalles de la siguiente explosión utilizando el método filter_by_station_graphic
+            return self.filter_by_station_graphic(request=request, explosion=next_explosion)
+            #return Response(next_explosion_details)
+        else:
+            return Response({'detail': 'No hay explosiones siguientes.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+    @action(detail=True, methods=['get'])
+    def previous_explosion_details(self, request, pk=None):
+        current_explosion = self.get_object()
+        explosions = Explosion.objects.all()
+        # Filtrar la explosión cronológicamente anterior
+        previous_explosion = explosions.filter(starttime__lt=current_explosion.starttime).order_by('-starttime').first()
+        #print(previous_explosion)
+        if previous_explosion:
+            # Obtener detalles de la explosión anterior utilizando el método filter_by_station_graphic
+            return self.filter_by_station_graphic(request=request, explosion=previous_explosion)
+            #return Response(previous_explosion_details)
+        else:
+            return Response({'detail': 'No hay explosiones anteriores.'}, status=status.HTTP_404_NOT_FOUND)
 class AlarmViewSet(ModelViewSet):
     """
     Sericio CRUD de Alarma
